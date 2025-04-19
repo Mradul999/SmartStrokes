@@ -8,10 +8,9 @@ export const textGenerate = async (req, res) => {
   const prompt =
     "Generate a 60-word passage. Make it grammatically correct and interesting.";
 
-
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.0-flash-lite",
       contents: prompt,
     });
 
