@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  
   "scripts": {
     "dev": "nodemon index.js"
   },
@@ -17,12 +16,7 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-<<<<<<< HEAD
-    "mongoose": "^8.13.2"
-=======
     "mongoose": "^8.13.2",
-    "nodemon": "^3.1.9",
-    "openai": "^4.95.1"
->>>>>>> a253fe98c6622f6348aa203926ed8bccb8fa1ed0
+    "nodemon": "^3.1.9"
   }
 }
