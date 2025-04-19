@@ -16,7 +16,9 @@ app.use(express.json());
 
 app.use("/api/text", textRoute);
 
-app.get("/test", test);
+// app.get("/test", test);
+
+// console.log("current port=>", process.env.PORT);
 
 const PORT = process.env.PORT || 3001;
 

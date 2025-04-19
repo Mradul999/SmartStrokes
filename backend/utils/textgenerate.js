@@ -1,28 +1,24 @@
 import axios from "axios";
 import dotenv from "dotenv";
 dotenv.config();
+import { GoogleGenAI } from "@google/genai";
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-export const textGenerate = async () => {
-  console.log(process.env.OPENAI_API_KEY);
+export const textGenerate = async (req, res) => {
   const prompt =
-    "Generate a 60 words  passage .make it gramatically correct and interesting ";
+    "Generate a 60-word passage. Make it grammatically correct and interesting.";
+
+
   try {
-    const response = await axios.post(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        model: "gpt-3.5-turbo",
-        messages: [{ role: user, content: prompt }],
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        },
-      }
-    );
-    res.status(200).json({ response });
-    console.log(response);
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: prompt,
+    });
+
+    res.status(200).json({ message: response.text });
+    console.log(response.text);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Failed to generate text" });
+    console.error("Gemini API error:", error);
+    res.status(500).json({ error: "Failed to generate text using Gemini API" });
   }
 };
