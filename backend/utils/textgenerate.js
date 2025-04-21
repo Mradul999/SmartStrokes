@@ -6,11 +6,11 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export const textGenerate = async (req, res) => {
   const prompt =
-    "Generate a 60-word passage. Make it grammatically correct and interesting.";
+    "Generate a 60-word passage. Make it grammatically correct and interesting. use special character also like @ ,# do not use emojis";
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash-lite",
+      model: "gemini-2.0-flash",
       contents: prompt,
     });
 

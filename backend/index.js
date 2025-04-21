@@ -5,6 +5,8 @@ import { dbconnect } from "./config/dbconnect.js";
 import textRoute from "./Routes/textRoute.js";
 import { test } from "./controllers/test.js";
 
+import authRoute from "./Routes/authRoute.js";
+
 dotenv.config();
 dbconnect();
 
@@ -15,6 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/text", textRoute);
+app.use("/api/auth", authRoute);
 
 // app.get("/test", test);
 
