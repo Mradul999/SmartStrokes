@@ -11,7 +11,7 @@ function App() {
         <Route path="/" element={<Home />}></Route>
         <Route path="/signup" element={<Signup />} />
         <Route path="/signin" element={<SignIn />} />
-        {/* <Route path='/otp-verification' element={<OTPVerification/>}/> */}
+        <Route path="/otp-verification" element={<OTPVerification />} />
       </Routes>
     </BrowserRouter>
   );

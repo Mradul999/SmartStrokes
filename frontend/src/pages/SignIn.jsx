@@ -1,62 +1,101 @@
-import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import React, { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import Header from "../components/Header";
+import { ClipLoader } from "react-spinners";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Signin = () => {
-    const [formData, setFormData] = useState({ email: '', password: '' });
-    const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-    const handleChange = (e) =>
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+  const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log(formData);
-        //api call
-    };
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-purple-100 to-blue-100 px-4">
-            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
-                <h2 className="text-2xl font-bold text-center text-purple-600 mb-4">Welcome Back</h2>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-                <div className="mb-4">
-                    <label className="block mb-1">Email</label>
-                    <input
-                        type="email"
-                        placeholder="Enter your email"
-                        name="email"
-                        required
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
-                    />
-                </div>
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/auth/login",
+        formData
+      );
+   
 
-                <div className="mb-6 relative">
-                    <label className="block mb-1">Password</label>
-                    <input
-                        type={showPassword ? 'text' : 'password'}
-                        name="password"
-                        placeholder="Enter your password"
-                        required
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
-                    />
-                    <span
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-9 cursor-pointer text-gray-500"
-                    >
-                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </span>
-                </div>
+      if (response.status === 200) {
+        setError("");
 
-                <button type="submit" className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition">
-                    Sign In
-                </button>
-            </form>
-        </div>
-    );
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error);
+      setError(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <Header />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-purple-100 to-blue-100 px-4">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-6 rounded-xl shadow-md w-full max-w-md"
+        >
+          <h2 className="text-2xl font-bold text-center text-purple-600 mb-4">
+            Welcome Back
+          </h2>
+
+          <div className="mb-4">
+            <label className="block mb-1">Email</label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              name="email"
+              required
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
+            />
+          </div>
+
+          <div className="mb-6 relative">
+            <label className="block mb-1">Password</label>
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Enter your password"
+              required
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
+            />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-9 cursor-pointer text-gray-500"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </span>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition flex justify-center items-center"
+            disabled={loading}
+          >
+            {loading ? <ClipLoader size={30} color="#fff" /> : "Sign In"}
+          </button>
+        </form>
+      </div>
+    </>
+  );
 };
 
 export default Signin;
