@@ -1,14 +1,19 @@
-import { useState } from 'react'
-import TypingBox from './components/TypingBox'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Signup from './pages/SignUp';
+import SignIn from './pages/SignIn';
+import OTPVerification from './pages/OtpVerification';
+
 
 function App() {
-  
-
   return (
-    <>
-    <TypingBox/>
-    </>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/signup" element={<Signup />} />
+        <Route path='/signin' element={<SignIn />} />
+        {/* <Route path='/otp-verification' element={<OTPVerification/>}/> */}
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
