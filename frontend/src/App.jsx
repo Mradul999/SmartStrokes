@@ -1,15 +1,16 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Signup from './pages/SignUp';
-import SignIn from './pages/SignIn';
-import OTPVerification from './pages/OtpVerification';
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Signup from "./pages/SignUp";
+import SignIn from "./pages/SignIn";
+import OTPVerification from "./pages/OtpVerification";
+import TypingBox from "./components/TypingBox";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<TypingBox />}></Route>
         <Route path="/signup" element={<Signup />} />
-        <Route path='/signin' element={<SignIn />} />
+        <Route path="/signin" element={<SignIn />} />
         {/* <Route path='/otp-verification' element={<OTPVerification/>}/> */}
       </Routes>
     </BrowserRouter>
