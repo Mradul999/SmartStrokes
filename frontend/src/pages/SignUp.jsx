@@ -4,8 +4,10 @@ import Header from "../components/Header";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
+import authStore from "../store/store.js";
 
 const Signup = () => {
+  const setVerifying = authStore((state) => state.setVerifying);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -46,6 +48,8 @@ const Signup = () => {
       if (response.status === 200) {
         setError("");
         setLoading(false);
+        setVerifying(true);
+
         sessionStorage.setItem("email", formData.email);
         navigate("/otp-verification");
       }

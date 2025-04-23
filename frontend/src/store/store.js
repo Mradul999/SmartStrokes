@@ -5,6 +5,8 @@ const store = create(
   persist(
     (set) => ({
       currentUser: null,
+      isVerifying: false,
+      setVerifying: (value) => set({ isVerifying: value }),
       setCurrentUser: (user) => set({ currentUser: user }),
       logout: () => set({ currentUser: null }),
     }),

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import authStore from "../store/store.js";
+import axios from "axios";
 
 const Header = () => {
   const currentUser = authStore((state) => state.currentUser);
@@ -22,6 +23,17 @@ const Header = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const logoutHandler = async () => {
+    try {
+      await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
+        withCredentials: true,
+      });
+      logout();
+      navigate("/signin");
+      setShowMenu(false);
+    } catch (error) {}
+  };
 
   return (
     <header className="flex justify-between items-center px-10 py-4 bg-purple-700 text-white shadow-md relative">
@@ -69,11 +81,7 @@ const Header = () => {
                   User Dashboard
                 </NavLink>
                 <button
-                  onClick={() => {
-                    logout();
-                    navigate("/signin");
-                    setShowMenu(false);
-                  }}
+                  onClick={logoutHandler}
                   className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                 >
                   Logout

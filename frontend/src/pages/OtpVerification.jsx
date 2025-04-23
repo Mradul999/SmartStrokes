@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
+import authStore from "../store/store.js";
 
 const OTPVerification = () => {
+  const setVerifying = authStore((state) => state.setVerifying);
+  const isVerifying = authStore((state) => state.isVerifying);
   const [otp, setOtp] = useState("");
 
   const [error, setError] = useState("");
@@ -12,6 +15,12 @@ const OTPVerification = () => {
   // Get email from localStorage or props or route state
   const email = sessionStorage.getItem("email");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isVerifying) {
+      navigate("/signin");
+    }
+  }, [isVerifying]);
 
   const handleChange = (e) => {
     setOtp(e.target.value);
@@ -33,6 +42,8 @@ const OTPVerification = () => {
 
       if (response.status === 200) {
         setLoading(false);
+        setVerifying(false);
+
         navigate("/signin");
       }
     } catch (error) {
