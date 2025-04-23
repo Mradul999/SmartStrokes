@@ -5,8 +5,12 @@ import { GoogleGenAI } from "@google/genai";
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export const textGenerate = async (req, res) => {
-  const prompt =
-    "Generate a 60-word passage. Make it grammatically correct and interesting. use special character also like @ ,# do not use emojis";
+  const wrongKeyPresses = req.body.misTypes;
+
+  // console.log("wrongKeyPresses from frontend", wrongKeyPresses);
+  // console.log("only first", wrongKeyPresses[0]);
+
+  const prompt = `generate a 200 word grammatically correct passage in english using only lowercase letters and no punctuation marks make the tone engaging and interesting additionally use the following letters  from the array (${wrongKeyPresses}).(If this array is empty ignore)  more frequently throughout the passage to help the user practice and improve their typing accuracy for these specific keys`;
 
   try {
     const response = await ai.models.generateContent({
@@ -15,7 +19,7 @@ export const textGenerate = async (req, res) => {
     });
 
     res.status(200).json({ message: response.text });
-    console.log(response.text);
+    // console.log(response.text);
   } catch (error) {
     console.error("Gemini API error:", error);
     res.status(500).json({ error: "Failed to generate text using Gemini API" });

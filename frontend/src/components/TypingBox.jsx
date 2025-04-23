@@ -1,19 +1,50 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
+import sampleParagraphs from "../data.json";
+import axios from "axios";
+import { ClipLoader } from "react-spinners";
 
 const TypingBox = () => {
-  const [userInput, setUserInput] = useState('');
+  const [userInput, setUserInput] = useState("");
   const [startTime, setStartTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState(60);
   const [wpm, setWpm] = useState(0);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
-  const [wrongKeyPresses, setWrongKeyPresses] = useState({});
+  const [wrongKeyPresses, setWrongKeyPresses] = useState([]);
+  console.log("wrong key press =>", wrongKeyPresses);
   const inputRef = useRef(null);
   const timerRef = useRef(null);
+  useEffect(() => {
+    setRandomParagraph();
+  }, []);
 
-  const sampleText =
-    "Many people underestimate the importance of developing good typing habits early on. In a world where digital communication dominates nearly every aspect of daily life, typing efficiently and accurately is more than just a convenience—it’s a critical skill. Whether you're a student completing assignments, a professional drafting emails, or someone chatting with friends, your ability to type quickly and clearly affects your productivity and communication. Learning to type without constantly looking at the keyboard, also known as touch typing, can dramatically increase your speed over time.";
-  const sampleWords = sampleText.split(' ');
+  const [sampleText, setSampleText] = useState("");
+  // console.log(sampleText);
+  const [sampleWords, setSampleWords] = useState([]);
+  // console.log(sampleWords);
+
+  const [loading, SetLoading] = useState(false);
+
+  const reset = () => {
+    setUserInput("");
+    setStartTime(null);
+    setTimeLeft(60);
+    setWpm(0);
+    setCurrentWordIndex(0);
+    setIsComplete(false);
+    setWrongKeyPresses([]);
+    inputRef.current.focus();
+  };
+
+  const setRandomParagraph = () => {
+    const randomIndex = Math.floor(
+      Math.random() * sampleParagraphs.paragraphs.length
+    );
+    const newText = sampleParagraphs.paragraphs[randomIndex];
+    setSampleText(newText);
+    setSampleWords(newText.split(" "));
+    reset();
+  };
 
   useEffect(() => {
     inputRef.current.focus();
@@ -60,10 +91,7 @@ const TypingBox = () => {
     const correspondingChar = sampleText[currentPosition];
 
     if (value.length > userInput.length && lastChar !== correspondingChar) {
-      setWrongKeyPresses((prev) => ({
-        ...prev,
-        [correspondingChar]: (prev[correspondingChar] || 0) + 1,
-      }));
+      setWrongKeyPresses((prev) => [...prev, correspondingChar]);
     }
 
     setUserInput(value);
@@ -82,59 +110,59 @@ const TypingBox = () => {
     if (!userInput) return 0;
 
     let correctChars = 0;
-    const userWords = userInput.split(' ');
+    const userWords = userInput.split(" ");
 
     sampleWords.forEach((word, wordIndex) => {
-      const userWord = userWords[wordIndex] || '';
-      word.split('').forEach((char, charIndex) => {
+      const userWord = userWords[wordIndex] || "";
+      word.split("").forEach((char, charIndex) => {
         if (charIndex < userWord.length && char === userWord[charIndex]) {
           correctChars++;
         }
       });
     });
 
-    const totalTypedChars = userInput.replace(/\s+/g, '').length;
+    const totalTypedChars = userInput.replace(/\s+/g, "").length;
     return totalTypedChars > 0
       ? Math.floor((correctChars / totalTypedChars) * 100)
       : 0;
   };
 
   const renderText = () => {
-    const userWords = userInput.split(' ');
+    const userWords = userInput.split(" ");
 
     return (
       <div className="flex flex-wrap leading-relaxed break-words">
         {sampleWords.map((word, wordIndex) => {
           const isCurrentWord = wordIndex === currentWordIndex && !isComplete;
-          const userWord = userWords[wordIndex] || '';
+          const userWord = userWords[wordIndex] || "";
           const isPastWord = wordIndex < currentWordIndex;
 
           return (
             <div
               key={wordIndex}
               className={`mr-2 mb-1 rounded ${
-                isCurrentWord ? 'bg-purple-100 px-1 py-0.5' : ''
+                isCurrentWord ? "bg-purple-100 px-1 py-0.5" : ""
               }`}
             >
-              {word.split('').map((char, charIndex) => {
-                let textColor = 'text-gray-500';
-                let fontWeight = 'font-normal';
+              {word.split("").map((char, charIndex) => {
+                let textColor = "text-gray-500";
+                let fontWeight = "font-normal";
 
                 if (isPastWord || isComplete) {
                   const userChar = userWord[charIndex];
                   if (userChar !== undefined) {
                     textColor =
-                      char === userChar ? 'text-green-600' : 'text-red-600';
+                      char === userChar ? "text-green-600" : "text-red-600";
                   }
                 } else if (isCurrentWord && charIndex < userWord.length) {
                   textColor =
                     char === userWord[charIndex]
-                      ? 'text-green-600'
-                      : 'text-red-600';
+                      ? "text-green-600"
+                      : "text-red-600";
                   fontWeight =
                     charIndex === userWord.length - 1
-                      ? 'font-bold'
-                      : 'font-normal';
+                      ? "font-bold"
+                      : "font-normal";
                 }
 
                 return (
@@ -151,6 +179,30 @@ const TypingBox = () => {
         })}
       </div>
     );
+  };
+  const setAiGeneratedtext = async () => {
+    try {
+      SetLoading(true);
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/text/gettext`,
+        { misTypes: wrongKeyPresses },
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        SetLoading(false);
+        console.log(response.data);
+        setSampleText(response.data.message);
+
+        setSampleWords(response.data.message.split(" "));
+        reset();
+      }
+    } catch (error) {
+      SetLoading(false);
+      console.log(error);
+      alert("failed to generate ai text");
+    }
   };
 
   return (
@@ -173,11 +225,11 @@ const TypingBox = () => {
         className={`w-full px-4 py-3 text-base mb-4 rounded-md border 
           ${
             isComplete
-              ? 'border-gray-300 bg-gray-100'
-              : 'border-purple-300 focus:ring-2 focus:ring-purple-400'
+              ? "border-gray-300 bg-gray-100"
+              : "border-purple-300 focus:ring-2 focus:ring-purple-400"
           } 
           transition-all shadow-sm outline-none`}
-        placeholder={isComplete ? 'Test completed!' : 'Start typing here...'}
+        placeholder={isComplete ? "Test completed!" : "Start typing here..."}
         disabled={isComplete || timeLeft === 0}
       />
 
@@ -194,36 +246,47 @@ const TypingBox = () => {
       </div>
 
       <div className="flex justify-center gap-4">
-        <button className="bg-purple-600 text-white px-6 py-2 rounded-md shadow hover:bg-purple-700 transition-all">
+        <button
+          onClick={setRandomParagraph}
+          className={`bg-purple-600 text-white px-6 py-2 rounded-md shadow hover:bg-purple-700 transition-all ${
+            loading && "pointer-events-none"
+          }`}
+        >
           Normal Practice
         </button>
-        <button className="bg-purple-600 text-white px-6 py-2 rounded-md shadow hover:bg-purple-700 transition-all">
-          AI Practice
+
+        <button
+          onClick={setAiGeneratedtext}
+          className={`bg-purple-600 ${
+            loading && "pointer-events-none "
+          } text-white px-6 py-2 rounded-md shadow w-[140px] flex items-center justify-center hover:bg-purple-700 transition-all`}
+        >
+          {loading ? <ClipLoader size={20} color="#fff" /> : "AI Practice"}
         </button>
       </div>
 
       {isComplete && (
         <div className="mt-6 space-y-3">
           <div className="p-3 bg-green-100 text-green-800 rounded-md">
-            🎉 Test completed! Speed: <strong>{wpm}</strong> WPM | Accuracy:{' '}
+            🎉 Test completed! Speed: <strong>{wpm}</strong> WPM | Accuracy:{" "}
             <strong>{calculateAccuracy()}%</strong>
           </div>
-          <div className="p-3 bg-gray-100 rounded-md">
+          {/* <div className="p-3 bg-gray-100 rounded-md">
             <h3 className="font-medium mb-2">Mistake Analysis:</h3>
             {Object.entries(wrongKeyPresses).length > 0 ? (
               <ul className="space-y-1">
                 {Object.entries(wrongKeyPresses).map(([char, count]) => (
                   <li key={char}>
                     Wrong key instead of '
-                    <span className="font-bold">{char}</span>': {count}{' '}
-                    time{count > 1 ? 's' : ''}
+                    <span className="font-bold">{char}</span>': {count} time
+                    {count > 1 ? "s" : ""}
                   </li>
                 ))}
               </ul>
             ) : (
               <p>No mistakes — Perfect typing! 🎯</p>
             )}
-          </div>
+          </div> */}
         </div>
       )}
     </div>
