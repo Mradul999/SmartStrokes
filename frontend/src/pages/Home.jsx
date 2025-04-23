@@ -1,16 +1,19 @@
-import React from 'react';
-import Header from '../components/Header';
-import TypingBox from '../components/TypingBox';
-import Footer from '../components/Footer';
+import React from "react";
+import Header from "../components/Header";
+import TypingBox from "../components/TypingBox";
+import Footer from "../components/Footer";
+import authStore from "../store/store.js";
 
 const Home = () => {
-    return (
-        <div>
-            <Header />
-            <TypingBox />
-            <Footer />
-        </div>
-    );
-}
+  const currentUser = authStore((state) => state.currentUser);
+  console.log("current user is ", currentUser);
+  return (
+    <div>
+      <Header />
+      <TypingBox />
+      <Footer />
+    </div>
+  );
+};
 
 export default Home;

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { dbconnect } from "./config/dbconnect.js";
 import textRoute from "./Routes/textRoute.js";
 import { test } from "./controllers/test.js";
+import cookieParser from "cookie-parser";
 
 import authRoute from "./Routes/authRoute.js";
 
@@ -12,9 +13,15 @@ dbconnect();
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/text", textRoute);
 app.use("/api/auth", authRoute);

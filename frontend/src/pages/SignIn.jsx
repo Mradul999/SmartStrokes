@@ -4,12 +4,15 @@ import Header from "../components/Header";
 import { ClipLoader } from "react-spinners";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import authStore from "../store/store.js";
 
 const Signin = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const setCurrentUser = authStore((state) => state?.setCurrentUser);
 
   const navigate = useNavigate();
 
@@ -23,13 +26,15 @@ const Signin = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/auth/login",
-        formData
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        formData,
+        { withCredentials: true }
       );
-   
 
       if (response.status === 200) {
         setError("");
+        // console.log(response.data);
+        setCurrentUser(response.data.existingUser);
 
         navigate("/");
       }
@@ -84,6 +89,11 @@ const Signin = () => {
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </span>
           </div>
+          {error && (
+            <div className="mb-4 text-red-600 bg-red-100 border border-red-400 p-3 rounded">
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"

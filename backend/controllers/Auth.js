@@ -50,12 +50,9 @@ export const verifyOTP = async (req, res) => {
       return res.status(400).json({ message: "Invalid OTP" });
 
     if (existingUser.otpExpiresAt < new Date()) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "OTP has expired .Please  signup again or request  a new otp",
-        });
+      return res.status(400).json({
+        message: "OTP has expired .Please  signup again or request  a new otp",
+      });
     }
 
     existingUser.isVerified = true;
@@ -95,7 +92,13 @@ export const login = async (req, res) => {
       expiresIn: "1d",
     });
 
-    res.status(200).json({ message: "User logged in successfully", token });
+    res
+      .cookie("access-token", token, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      })
+      .status(200)
+      .json({ message: "User logged in successfully", existingUser });
   } catch (error) {
     console.log(error);
     res
