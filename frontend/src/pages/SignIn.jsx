@@ -6,6 +6,9 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import authStore from "../store/store.js";
 
+import TypingresultStore from "../store/TypingResultStore.js";
+import { saveResult } from "../utils/saveResult.js";
+
 const Signin = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +16,9 @@ const Signin = () => {
   const [error, setError] = useState("");
 
   const setCurrentUser = authStore((state) => state?.setCurrentUser);
+
+  const typingResult = TypingresultStore((state) => state.typingResult);
+  console.log(typingResult);
 
   const navigate = useNavigate();
 
@@ -35,6 +41,7 @@ const Signin = () => {
         setError("");
         // console.log(response.data);
         setCurrentUser(response.data.existingUser);
+        saveResult(typingResult);
 
         navigate("/");
       }
