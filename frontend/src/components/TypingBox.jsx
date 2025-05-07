@@ -1,17 +1,25 @@
-import React, { useState, useEffect, useRef } from "react";
+"use client";
+
+import { useState, useEffect, useRef } from "react";
 import sampleParagraphs from "../data.json";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
+import auhtStore from "../store/store.js";
+import { NavLink } from "react-router-dom";
+import { saveResult } from "../utils/saveResult.js";
+
+import TypingresultStore from "../store/TypingResultStore.js";
 
 const TypingBox = () => {
   const [userInput, setUserInput] = useState("");
   const [startTime, setStartTime] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(60);
+  const [timeLeft, setTimeLeft] = useState(10);
+
   const [wpm, setWpm] = useState(0);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   const [wrongKeyPresses, setWrongKeyPresses] = useState([]);
-  console.log("wrong key press =>", wrongKeyPresses);
+  // console.log("wrong key press =>", wrongKeyPresses);
   const inputRef = useRef(null);
   const timerRef = useRef(null);
   useEffect(() => {
@@ -25,10 +33,14 @@ const TypingBox = () => {
 
   const [loading, SetLoading] = useState(false);
 
+  const currentUser = auhtStore((state) => state.currentUser);
+
+  const setTypingresult = TypingresultStore((state) => state.setTypingresult);
+
   const reset = () => {
     setUserInput("");
     setStartTime(null);
-    setTimeLeft(60);
+    setTimeLeft(10);
     setWpm(0);
     setCurrentWordIndex(0);
     setIsComplete(false);
@@ -57,6 +69,8 @@ const TypingBox = () => {
           if (prev <= 1) {
             clearInterval(timerRef.current);
             setIsComplete(true);
+            // Make sure to calculate final results when time runs out
+
             inputRef.current.blur();
             return 0;
           }
@@ -73,12 +87,14 @@ const TypingBox = () => {
       setStartTime(Date.now());
     }
 
-    if (userInput.length > 0 && startTime && !isComplete) {
-      const timeElapsed = (Date.now() - startTime) / 60000;
+    // Only calculate WPM when the test is complete
+    if (isComplete || timeLeft === 0) {
+      const timeElapsed =
+        (startTime ? Date.now() - startTime : 0) / 60000 || 0.001; // Avoid division by zero
       const wordsTyped = userInput.trim().split(/\s+/).length;
       setWpm(Math.floor(wordsTyped / timeElapsed));
     }
-  }, [userInput, startTime, isComplete]);
+  }, [userInput, startTime, isComplete, timeLeft]);
 
   const handleInputChange = (e) => {
     if (isComplete || timeLeft <= 0) return;
@@ -86,12 +102,18 @@ const TypingBox = () => {
     const value = e.target.value;
     if (value.length > sampleText.length) return;
 
-    const currentPosition = value.length - 1;
-    const lastChar = value[currentPosition];
-    const correspondingChar = sampleText[currentPosition];
+    // Check for mistakes
+    if (value.length > userInput.length) {
+      const currentPosition = value.length - 1;
+      const lastChar = value[currentPosition];
+      const correspondingChar = sampleText[currentPosition];
 
-    if (value.length > userInput.length && lastChar !== correspondingChar) {
-      setWrongKeyPresses((prev) => [...prev, correspondingChar]);
+      if (lastChar !== correspondingChar) {
+        console.log(
+          `Wrong key press: expected '${correspondingChar}', got '${lastChar}'`
+        );
+        setWrongKeyPresses((prev) => [...prev, correspondingChar]);
+      }
     }
 
     setUserInput(value);
@@ -110,21 +132,18 @@ const TypingBox = () => {
     if (!userInput) return 0;
 
     let correctChars = 0;
-    const userWords = userInput.split(" ");
+    let totalChars = 0;
 
-    sampleWords.forEach((word, wordIndex) => {
-      const userWord = userWords[wordIndex] || "";
-      word.split("").forEach((char, charIndex) => {
-        if (charIndex < userWord.length && char === userWord[charIndex]) {
-          correctChars++;
-        }
-      });
-    });
+    // Compare each character the user has typed with the sample text
+    for (let i = 0; i < userInput.length; i++) {
+      totalChars++;
+      if (userInput[i] === sampleText[i]) {
+        correctChars++;
+      }
+    }
 
-    const totalTypedChars = userInput.replace(/\s+/g, "").length;
-    return totalTypedChars > 0
-      ? Math.floor((correctChars / totalTypedChars) * 100)
-      : 0;
+    console.log("Correct chars:", correctChars, "Total chars:", totalChars);
+    return totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 0;
   };
 
   const renderText = () => {
@@ -204,6 +223,35 @@ const TypingBox = () => {
       alert("failed to generate ai text");
     }
   };
+  // const saveResult = async (result) => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${import.meta.env.VITE_API_URL}/api/result/saveresult`,
+  //       result,
+  //       { withCredentials: true }
+  //     );
+
+  //     console.log(response.data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  if (isComplete) {
+    const result = {
+      userId: currentUser?._id,
+      wpm,
+      sampleText,
+      wrongKeyPresses,
+      accuracy: calculateAccuracy(),
+      userInput,
+    };
+    console.log(result);
+    setTypingresult(result);
+    if (currentUser) {
+      saveResult(result);
+    }
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-6 font-sans">
@@ -238,10 +286,6 @@ const TypingBox = () => {
           Progress: {Math.min(currentWordIndex + 1, sampleWords.length)}/
           {sampleWords.length}
         </div>
-        <div className="font-medium text-purple-700">WPM: {wpm}</div>
-        <div className="font-medium text-purple-700">
-          Accuracy: {calculateAccuracy()}%
-        </div>
         <div className="font-medium text-red-500">⏱ {timeLeft}s</div>
       </div>
 
@@ -266,10 +310,21 @@ const TypingBox = () => {
       </div>
 
       {isComplete && (
-        <div className="mt-6 space-y-3">
-          <div className="p-3 bg-green-100 text-green-800 rounded-md">
+        <div className="mt-6 space-y-3 flex flex-col   items-center">
+          <div className="p-3 bg-green-100 text-green-800 rounded-md w-full">
             🎉 Test completed! Speed: <strong>{wpm}</strong> WPM | Accuracy:{" "}
             <strong>{calculateAccuracy()}%</strong>
+          </div>
+          <div>
+            {!currentUser && (
+              <span className="font-medium text-lg">
+                {" "}
+                <NavLink to="/signin">
+                  <span className="font-bold  text-purple-400">Signin </span>
+                </NavLink>
+                to save your results
+              </span>
+            )}
           </div>
           {/* <div className="p-3 bg-gray-100 rounded-md">
             <h3 className="font-medium mb-2">Mistake Analysis:</h3>

@@ -8,6 +8,8 @@ import cookieParser from "cookie-parser";
 
 import authRoute from "./Routes/authRoute.js";
 
+import resultRoute from "./Routes/resultRoute.js";
+
 dotenv.config();
 dbconnect();
 
@@ -25,6 +27,7 @@ app.use(cookieParser());
 
 app.use("/api/text", textRoute);
 app.use("/api/auth", authRoute);
+app.use("/api/result", resultRoute);
 
 // app.get("/test", test);
 
