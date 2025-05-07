@@ -286,7 +286,16 @@ const TypingBox = () => {
             ) : (
               <p>No mistakes — Perfect typing! 🎯</p>
             )}
-          </div> */}
+          </div> */}console.log("userInput =>", userInput);
+console.log("startTime =>", startTime);
+console.log("timeLeft =>", timeLeft);
+console.log("wpm =>", wpm);
+console.log("currentWordIndex =>", currentWordIndex);
+console.log("isComplete =>", isComplete);
+console.log("wrongKeyPresses =>", wrongKeyPresses);
+console.log("sampleText =>", sampleText);
+console.log("sampleWords =>", sampleWords);
+console.log("loading =>", loading);
         </div>
       )}
     </div>
