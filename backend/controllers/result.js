@@ -19,6 +19,7 @@ export const saveResult = async (req, res) => {
     // console.log("userid ", userId);
 
     const { wpm, sampleText, wrongKeyPresses, accuracy, userInput } = req.body;
+    
 
     console.log(wrongKeyPresses);
 
