@@ -3,6 +3,7 @@ import axios from "axios";
 import authStore from "../store/store.js";
 
 const Dashboard = () => {
+<<<<<<< HEAD
   const currentUser = authStore((state) => state.currentUser);
   const [performance, setPerformance] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -283,6 +284,13 @@ const Dashboard = () => {
       </div>
     </div>
   );
+=======
+  
+
+  return <div>
+    
+  </div>;
+>>>>>>> d30dd5aa96b1d6cf801b1588d4b34248289123bb
 };
 
 export default Dashboard;

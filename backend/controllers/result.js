@@ -18,7 +18,12 @@ export const saveResult = async (req, res) => {
     const userId = decoded.id;
     // console.log("userid ", userId);
 
+<<<<<<< HEAD
     const { wpm, sampleText, wrongKeyPresses, accuracy, userInput, weakKeyStats } = req.body;
+=======
+    const { wpm, sampleText, wrongKeyPresses, accuracy, userInput } = req.body;
+    
+>>>>>>> d30dd5aa96b1d6cf801b1588d4b34248289123bb
 
     console.log(wrongKeyPresses);
 
