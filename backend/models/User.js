@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema(
     isVerified: {
       type: Boolean,
     },
+    profileImage:{
+      type:String,
+      default:"https://thumbs.dreamstime.com/b/modern-random-cartoon-sticker-detailed-illustrated-isolated-white-background-modern-random-cartoon-sticker-detailed-illustrated-353166857.jpg"
+    }
   },
   { timestamps: true }
 );

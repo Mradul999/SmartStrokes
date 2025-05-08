@@ -34,6 +34,11 @@ const userTypingSessionSchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
-});
+  weakKeyStats: {
+    type: Map,
+    of: Number,
+    default: {},
+  }
+}, { timestamps: true });
 
 export default mongoose.model("TypingResult", userTypingSessionSchema);

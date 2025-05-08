@@ -5,10 +5,12 @@ import OTPVerification from "./pages/OtpVerification";
 import Home from "./pages/Home";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
+import Layout from "./components/Layout";
 
 function App() {
   return (
     <BrowserRouter>
+    <Layout>
       <Routes>
         <Route path="/" element={<Home />}></Route>
         <Route
@@ -30,6 +32,7 @@ function App() {
         <Route path="/otp-verification" element={<OTPVerification />} />
         <Route path="/dashboard" element={<Dashboard />}></Route>
       </Routes>
+    </Layout>
     </BrowserRouter>
   );
 }

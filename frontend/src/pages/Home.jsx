@@ -9,9 +9,7 @@ const Home = () => {
   console.log("current user is ", currentUser);
   return (
     <div>
-      <Header />
       <TypingBox />
-      <Footer />
     </div>
   );
 };
