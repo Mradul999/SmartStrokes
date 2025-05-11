@@ -83,7 +83,7 @@ const Dashboard = () => {
                 <img
                   src={currentUser?.profileImage}
                   alt="Profile"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover"              
                 />
               </div>
               <div
@@ -120,7 +120,7 @@ const Dashboard = () => {
               <p className="text-gray-500 mb-3">{currentUser?.email}</p>
               <div className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
                 <span className="mr-1">⭐</span>
-                <span className="font-semibold">TypeMaster</span>
+                <span className="font-semibold">SmartStrokes</span>
                 <span className="ml-1 text-xs bg-purple-200 px-2 py-0.5 rounded-full">
                   Level{" "}
                   {Math.max(1, Math.floor((performance?.averageWpm || 0) / 10))}
@@ -133,7 +133,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl">
             <div className="flex items-start justify-between">
-              <div>
+    <div>
                 <p className="text-lg font-semibold text-gray-600 mb-1">
                   Average Speed
                 </p>
@@ -178,7 +178,7 @@ const Dashboard = () => {
 
           <div className="bg-white rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl">
             <div className="flex items-start justify-between">
-              <div>
+        <div>
                 <p className="text-lg font-semibold text-gray-600 mb-1">
                   Accuracy
                 </p>
@@ -218,7 +218,7 @@ const Dashboard = () => {
 
           <div className="bg-white rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl">
             <div className="flex items-start justify-between">
-              <div>
+        <div>
                 <p className="text-lg font-semibold text-gray-600 mb-1">
                   Total Sessions
                 </p>
@@ -426,9 +426,9 @@ const Dashboard = () => {
                         </div>
                       )
                     )}
-                  </div>
-                </div>
-                <div>
+        </div>
+        </div>
+        <div>
                   <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -511,7 +511,7 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-            </div>
+        </div>
           )}
       </div>
     </div>

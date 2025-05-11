@@ -7,37 +7,44 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import Layout from "./components/Layout";
+import { ThemeProvider } from "./context/ThemeContext";
 
 function App() {
   return (
-    <BrowserRouter>
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Home />}></Route>
-        <Route path="/about" element={<About />}></Route>
-        <Route path="/contact" element={<Contact />}></Route>
-        <Route
-          path="/signup"
-          element={
-            <ProtectedRoute>
-              <Signup />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/signin"
-          element={
-            <ProtectedRoute>
-              <SignIn />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/otp-verification" element={<OTPVerification />} />
-        <Route path="/dashboard" element={<Dashboard />}></Route>
-      </Routes>
-    </Layout>
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />}></Route>
+            <Route path="/about" element={<About />}></Route>
+            <Route path="/contact" element={<Contact />}></Route>
+            <Route path="/privacy" element={<Privacy />}></Route>
+            <Route path="/terms" element={<Terms />}></Route>
+            <Route
+              path="/signup"
+              element={
+                <ProtectedRoute>
+                  <Signup />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/signin"
+              element={
+                <ProtectedRoute>
+                  <SignIn />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/otp-verification" element={<OTPVerification />} />
+            <Route path="/dashboard" element={<Dashboard />}></Route>
+          </Routes>
+        </Layout>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

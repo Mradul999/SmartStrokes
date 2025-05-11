@@ -1,9 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import authStore from "../store/store.js";
 import axios from "axios";
+import { ThemeContext } from "../context/ThemeContext";
 
 const Header = () => {
+  const { theme } = useContext(ThemeContext);
   const currentUser = authStore((state) => state.currentUser);
   const logout = authStore((state) => state.logout);
   const [showMenu, setShowMenu] = useState(false);
@@ -58,16 +60,35 @@ const Header = () => {
     return location.pathname === path;
   };
 
+  // Determine header background based on theme and scroll state
+  let headerBg;
+  if (theme === "dark") {
+    headerBg = scrolled ? "bg-gray-800 shadow-md" : "bg-gradient-to-r from-purple-900 to-indigo-900";
+  } else {
+    headerBg = scrolled ? "bg-white shadow-md" : "bg-gradient-to-r from-purple-600 to-indigo-600";
+  }
+
+  // Determine text and link colors based on theme and scroll state
+  const textColor = theme === "dark" 
+    ? (scrolled ? "text-gray-200" : "text-white") 
+    : (scrolled ? "text-purple-600" : "text-white");
+  
+  const linkBgActive = theme === "dark"
+    ? (scrolled ? "bg-purple-700 text-white" : "bg-gray-800 text-purple-300")
+    : (scrolled ? "bg-purple-600 text-white" : "bg-white text-purple-700");
+  
+  const linkBgNormal = theme === "dark"
+    ? (scrolled ? "bg-gray-700 text-gray-200 hover:bg-gray-600" : "bg-purple-800/30 text-gray-200 hover:bg-purple-800/50")
+    : (scrolled ? "bg-purple-50 text-purple-700 hover:bg-purple-100" : "bg-purple-500/30 text-white hover:bg-purple-500/50");
+
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white shadow-md py-3" : "bg-gradient-to-r from-purple-600 to-indigo-600 py-4"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBg} ${scrolled ? "py-3" : "py-4"}`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           <NavLink to="/" className="flex items-center">
-            <div className={`flex items-center ${scrolled ? "text-purple-600" : "text-white"}`}>
+            <div className={`flex items-center ${textColor}`}>
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
                 viewBox="0 0 24 24" 
@@ -80,7 +101,7 @@ const Header = () => {
               >
                 <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
               </svg>
-              <span className="text-2xl font-bold tracking-tight">TypeMaster</span>
+              <span className="text-2xl font-bold tracking-tight">SmartStrokes</span>
             </div>
           </NavLink>
 
@@ -89,13 +110,7 @@ const Header = () => {
             <NavLink 
               to="/about" 
               className={`flex items-center py-2 px-4 rounded-lg text-sm font-medium transition-all ${
-                scrolled 
-                  ? isActive("/about") 
-                    ? "bg-purple-600 text-white"
-                    : "bg-purple-50 text-purple-700 hover:bg-purple-100" 
-                  : isActive("/about")
-                    ? "bg-white text-purple-700"
-                    : "bg-purple-500/30 text-white hover:bg-purple-500/50"
+                isActive("/about") ? linkBgActive : linkBgNormal
               }`}
             >
               About
@@ -105,13 +120,7 @@ const Header = () => {
             <NavLink 
               to="/contact" 
               className={`flex items-center py-2 px-4 rounded-lg text-sm font-medium transition-all ${
-                scrolled 
-                  ? isActive("/contact") 
-                    ? "bg-purple-600 text-white"
-                    : "bg-purple-50 text-purple-700 hover:bg-purple-100" 
-                  : isActive("/contact")
-                    ? "bg-white text-purple-700"
-                    : "bg-purple-500/30 text-white hover:bg-purple-500/50"
+                isActive("/contact") ? linkBgActive : linkBgNormal
               }`}
             >
               Contact
@@ -122,13 +131,7 @@ const Header = () => {
                 <NavLink 
                   to="/signup" 
                   className={`hidden sm:flex items-center py-2 px-4 rounded-lg text-sm font-medium transition-all ${
-                    scrolled 
-                      ? isActive("/signup") 
-                        ? "bg-purple-600 text-white"
-                        : "bg-purple-50 text-purple-700 hover:bg-purple-100" 
-                      : isActive("/signup")
-                        ? "bg-white text-purple-700"
-                        : "bg-purple-500/30 text-white hover:bg-purple-500/50"
+                    isActive("/signup") ? linkBgActive : linkBgNormal
                   }`}
                 >
                   Sign Up
@@ -136,13 +139,11 @@ const Header = () => {
                 <NavLink 
                   to="/signin" 
                   className={`flex items-center py-2 px-4 rounded-lg text-sm font-medium transition-all ${
-                    scrolled 
-                      ? isActive("/signin") 
-                        ? "bg-purple-600 text-white" 
-                        : "bg-purple-100 text-purple-700 hover:bg-purple-200" 
-                      : isActive("/signin")
-                        ? "bg-white text-purple-700"
-                        : "bg-white/90 text-purple-700 hover:bg-white"
+                    isActive("/signin") 
+                      ? linkBgActive
+                      : (theme === "dark" 
+                         ? "bg-gray-700 text-gray-200 hover:bg-gray-600" 
+                         : (scrolled ? "bg-purple-100 text-purple-700 hover:bg-purple-200" : "bg-white/90 text-purple-700 hover:bg-white"))
                   }`}
                 >
                   Sign In
@@ -152,61 +153,83 @@ const Header = () => {
               <div className="relative" ref={menuRef}>
                 <div
                   className={`flex items-center gap-3 cursor-pointer py-1.5 px-3 rounded-lg ${
-                    scrolled ? "hover:bg-gray-100" : "hover:bg-purple-500/30"
+                    theme === "dark" 
+                      ? (scrolled ? "hover:bg-gray-700" : "hover:bg-purple-800/30")
+                      : (scrolled ? "hover:bg-gray-100" : "hover:bg-purple-500/30")
                   }`}
                   onClick={() => setShowMenu((prev) => !prev)}
                 >
                   <div className="hidden md:block">
-                    <p className={`text-sm font-medium ${scrolled ? "text-gray-700" : "text-white"}`}>
+                    <p className={`text-sm font-medium ${
+                      theme === "dark" 
+                        ? "text-gray-200" 
+                        : (scrolled ? "text-gray-700" : "text-white")
+                    }`}>
                       {currentUser.name && currentUser.name.split(" ")[0]}
                     </p>
-                    <p className={`text-xs ${scrolled ? "text-gray-500" : "text-purple-200"}`}>
+                    <p className={`text-xs ${
+                      theme === "dark" 
+                        ? "text-gray-400" 
+                        : (scrolled ? "text-gray-500" : "text-purple-200")
+                    }`}>
                       View dashboard
                     </p>
                   </div>
                   <div className="relative w-9 h-9">
                     <img
                       src={
-                        currentUser.profilePic ||
+                        currentUser?.profileImage ||
                         "https://cdn.vectorstock.com/i/1000v/95/56/user-profile-icon-avatar-or-person-vector-45089556.jpg"
                       }
                       alt="User"
                       className="rounded-full w-full h-full object-cover border-2 shadow-sm"
-                      style={{ borderColor: scrolled ? "#e5e7eb" : "#ffffff" }}
+                      style={{ 
+                        borderColor: theme === "dark" 
+                          ? (scrolled ? "#374151" : "#4B5563") 
+                          : (scrolled ? "#e5e7eb" : "#ffffff") 
+                      }}
                     />
                     <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 bg-green-400 ${
-                      scrolled ? "border-white" : "border-purple-600"
+                      theme === "dark" 
+                        ? (scrolled ? "border-gray-800" : "border-purple-900") 
+                        : (scrolled ? "border-white" : "border-purple-600")
                     }`}></div>
                   </div>
                 </div>
 
                 {showMenu && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg overflow-hidden z-50 border border-gray-100">
-                    <div className="p-3 border-b border-gray-100">
+                  <div className={`absolute right-0 mt-2 w-56 ${
+                    theme === "dark" ? "bg-gray-800 shadow-lg border border-gray-700" : "bg-white shadow-lg border border-gray-100"
+                  } rounded-xl overflow-hidden z-50`}>
+                    <div className={`p-3 ${theme === "dark" ? "border-b border-gray-700" : "border-b border-gray-100"}`}>
                       <div className="flex items-center gap-3">
                         <img
                           src={
-                            currentUser.profilePic ||
+                            currentUser.profileImage ||
                             "https://cdn.vectorstock.com/i/1000v/95/56/user-profile-icon-avatar-or-person-vector-45089556.jpg"
                           }
                           alt="User"
-                          className="rounded-full w-10 h-10 object-cover border-2 border-purple-100"
+                          className={`rounded-full w-10 h-10 object-cover border-2 ${theme === "dark" ? "border-gray-700" : "border-purple-100"}`}
                         />
                         <div>
-                          <p className="text-sm font-medium text-gray-800">{currentUser.name}</p>
-                          <p className="text-xs text-gray-500 truncate max-w-[150px]">{currentUser.email}</p>
+                          <p className={`text-sm font-medium ${theme === "dark" ? "text-gray-200" : "text-gray-800"}`}>{currentUser.name}</p>
+                          <p className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"} truncate max-w-[150px]`}>{currentUser.email}</p>
                         </div>
                       </div>
                     </div>
                     <div className="py-1">
                       <NavLink
                         to="/dashboard"
-                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                        className={`flex items-center px-4 py-2.5 text-sm ${
+                          theme === "dark" 
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-purple-400" 
+                            : "text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                        }`}
                         onClick={() => setShowMenu(false)}
                       >
                         <svg 
                           xmlns="http://www.w3.org/2000/svg" 
-                          className="h-5 w-5 mr-3 text-gray-400" 
+                          className={`h-5 w-5 mr-3 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}
                           fill="none" 
                           viewBox="0 0 24 24" 
                           stroke="currentColor"
@@ -215,14 +238,19 @@ const Header = () => {
                         </svg>
                         Dashboard
                       </NavLink>
+                      
                       <NavLink
                         to="/"
-                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                        className={`flex items-center px-4 py-2.5 text-sm ${
+                          theme === "dark" 
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-purple-400" 
+                            : "text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                        }`}
                         onClick={() => setShowMenu(false)}
                       >
                         <svg 
                           xmlns="http://www.w3.org/2000/svg" 
-                          className="h-5 w-5 mr-3 text-gray-400" 
+                          className={`h-5 w-5 mr-3 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}
                           fill="none" 
                           viewBox="0 0 24 24" 
                           stroke="currentColor"
@@ -231,14 +259,19 @@ const Header = () => {
                         </svg>
                         Practice Typing
                       </NavLink>
+                      
                       <NavLink
                         to="/about"
-                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                        className={`flex items-center px-4 py-2.5 text-sm ${
+                          theme === "dark" 
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-purple-400" 
+                            : "text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                        }`}
                         onClick={() => setShowMenu(false)}
                       >
                         <svg 
                           xmlns="http://www.w3.org/2000/svg" 
-                          className="h-5 w-5 mr-3 text-gray-400" 
+                          className={`h-5 w-5 mr-3 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}
                           fill="none" 
                           viewBox="0 0 24 24" 
                           stroke="currentColor"
@@ -247,31 +280,20 @@ const Header = () => {
                         </svg>
                         About Us
                       </NavLink>
-                      <NavLink
-                        to="/contact"
-                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700"
-                        onClick={() => setShowMenu(false)}
-                      >
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          className="h-5 w-5 mr-3 text-gray-400" 
-                          fill="none" 
-                          viewBox="0 0 24 24" 
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        Contact Us
-                      </NavLink>
-                    </div>
-                    <div className="border-t border-gray-100">
+                      
+                      <hr className={theme === "dark" ? "border-gray-700 my-1" : "border-gray-100 my-1"} />
+                      
                       <button
                         onClick={logoutHandler}
-                        className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50"
+                        className={`w-full text-left flex items-center px-4 py-2.5 text-sm ${
+                          theme === "dark" 
+                            ? "text-red-400 hover:bg-gray-700" 
+                            : "text-red-600 hover:bg-red-50"
+                        }`}
                       >
                         <svg 
                           xmlns="http://www.w3.org/2000/svg" 
-                          className="h-5 w-5 mr-3 text-red-500" 
+                          className="h-5 w-5 mr-3" 
                           fill="none" 
                           viewBox="0 0 24 24" 
                           stroke="currentColor"

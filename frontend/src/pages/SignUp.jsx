@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Header from "../components/Header";
 import axios from "axios";
@@ -13,14 +13,37 @@ const Signup = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    profilePic: ""
   });
   const [error, setError] = useState("");
+  const [avatarSeed, setAvatarSeed] = useState("");
+  const [avatarStyle, setAvatarStyle] = useState("avataaars");
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  // Generate a random avatar on component mount
+  useEffect(() => {
+    generateRandomAvatar();
+  }, []);
+
+  const generateRandomAvatar = () => {
+    // Generate a random seed for the avatar
+    const seed = Math.random().toString(36).substring(2, 10);
+    setAvatarSeed(seed);
+    
+    // Randomly select one of several DiceBear avatar styles
+    const styles = ["avataaars", "bottts", "identicon", "initials", "micah", "pixel-art"];
+    const randomStyle = styles[Math.floor(Math.random() * styles.length)];
+    setAvatarStyle(randomStyle);
+    
+    // Create the DiceBear URL
+    const avatarUrl = `https://avatars.dicebear.com/api/${randomStyle}/${seed}.svg`;
+    setFormData(prev => ({...prev, profilePic: avatarUrl}));
+  };
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,6 +59,7 @@ const Signup = () => {
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
+      setLoading(false);
       return;
     }
 
@@ -58,7 +82,7 @@ const Signup = () => {
     } catch (error) {
       setLoading(false);
       console.log(error);
-      setError(error.response.data.message);
+      setError(error.response?.data?.message || "An error occurred during registration");
       return;
     }
   };
@@ -74,6 +98,24 @@ const Signup = () => {
           <h2 className="text-2xl font-bold text-center text-purple-600 mb-4">
             Create Account
           </h2>
+
+          {/* Avatar preview */}
+          <div className="mb-6 flex flex-col items-center">
+            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-purple-200 mb-2">
+              <img 
+                src={formData.profilePic} 
+                alt="Avatar" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={generateRandomAvatar}
+              className="text-purple-600 text-sm font-medium hover:text-purple-800 transition-colors"
+            >
+              Generate New Avatar
+            </button>
+          </div>
 
           <div className="mb-4">
             <label className="block mb-1">Full Name</label>

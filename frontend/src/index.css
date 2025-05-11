@@ -1,1 +1,105 @@
 @import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for dark theme transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme body styles */
+body.dark-theme {
+  background-color: #111827; /* gray-900 */
+  color: #f3f4f6; /* gray-100 */
+}
+
+/* Custom typography for dark theme */
+.dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme h4, .dark-theme h5, .dark-theme h6 {
+  color: #f3f4f6; /* gray-100 */
+}
+
+/* Style for buttons in dark theme */
+.dark-theme button:not(.bg-purple-600):not(.bg-purple-700):not(.bg-purple-800) {
+  background-color: #1f2937; /* gray-800 */
+  color: #f3f4f6; /* gray-100 */
+}
+
+.dark-theme button:not(.bg-purple-600):not(.bg-purple-700):not(.bg-purple-800):hover {
+  background-color: #374151; /* gray-700 */
+}
+
+/* Dark theme form input styles */
+.dark-theme input, .dark-theme textarea, .dark-theme select {
+  background-color: #1f2937; /* gray-800 */
+  border-color: #374151; /* gray-700 */
+  color: #f3f4f6; /* gray-100 */
+}
+
+.dark-theme input:focus, .dark-theme textarea:focus, .dark-theme select:focus {
+  border-color: #a78bfa; /* purple-400 */
+  box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2); /* purple-400 with opacity */
+}
+
+/* Container styles for dark theme */
+.dark-theme .bg-white {
+  background-color: #1f2937; /* gray-800 */
+}
+
+.dark-theme .border {
+  border-color: #374151; /* gray-700 */
+}
+
+.dark-theme .shadow-md, .dark-theme .shadow-lg, .dark-theme .shadow-xl {
+  --tw-shadow-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Dark theme specific typography */
+.dark-theme .text-gray-900 {
+  color: #f3f4f6; /* gray-100 */
+}
+
+.dark-theme .text-gray-800 {
+  color: #f9fafb; /* gray-50 */
+}
+
+.dark-theme .text-gray-700 {
+  color: #e5e7eb; /* gray-200 */
+}
+
+.dark-theme .text-gray-600 {
+  color: #d1d5db; /* gray-300 */
+}
+
+.dark-theme .text-gray-500 {
+  color: #9ca3af; /* gray-400 */
+}
+
+/* Purple accents in dark theme */
+.dark-theme .text-purple-600 {
+  color: #a78bfa; /* purple-400 */
+}
+
+.dark-theme .text-purple-700 {
+  color: #8b5cf6; /* purple-500 */
+}
+
+.dark-theme .border-purple-600 {
+  border-color: #a78bfa; /* purple-400 */
+}
+
+.dark-theme .bg-purple-600 {
+  background-color: #8b5cf6; /* purple-500 */
+}
+
+.dark-theme .bg-purple-100 {
+  background-color: #312e81; /* indigo-900 */
+  color: #a78bfa; /* purple-400 */
+}
+
+.dark-theme .hover\:bg-purple-50:hover {
+  background-color: #4c1d95; /* purple-900 */
+}
