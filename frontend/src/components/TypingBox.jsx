@@ -111,7 +111,47 @@ const TypingBox = () => {
       const timeElapsed =
         (startTime ? Date.now() - startTime : 0) / 60000 || 0.001;
       const wordsTyped = userInput.trim().split(/\s+/).length;
-      setWpm(Math.floor(wordsTyped / timeElapsed));
+      const calculatedWpm = Math.floor(wordsTyped / timeElapsed);
+      setWpm(calculatedWpm);
+      
+      // Format weakKeyStats for MongoDB Map storage
+      const formattedWeakKeyStats = {};
+      
+      // Copy the weakKeyStats object properties
+      Object.keys(weakKeyStats).forEach(key => {
+        formattedWeakKeyStats[key] = weakKeyStats[key];
+      });
+      
+      // Calculate correct and incorrect characters
+      let correctChars = 0;
+      let incorrectChars = 0;
+      
+      for (let i = 0; i < userInput.length; i++) {
+        if (i < sampleText.length && userInput[i] === sampleText[i]) {
+          correctChars++;
+        } else {
+          incorrectChars++;
+        }
+      }
+      
+      const result = {
+        userId: currentUser?._id,
+        wpm: calculatedWpm,
+        sampleText,
+        wrongKeyPresses,
+        weakKeyStats: formattedWeakKeyStats,
+        accuracy: calculateAccuracy(),
+        userInput,
+        correctChars,
+        incorrectChars
+      };
+      
+      setTypingresult(result);
+      
+      if (currentUser) {
+        console.log("Saving result:", result);
+        saveResult(result);
+      }
     }
 
     // Scroll to keep cursor visible
@@ -252,24 +292,6 @@ const TypingBox = () => {
       alert("Failed to generate AI text");
     }
   };
-
-  useEffect(() => {
-    if (isComplete) {
-      const result = {
-        userId: currentUser?._id,
-        wpm,
-        sampleText,
-        wrongKeyPresses,
-        weakKeyStats,
-        accuracy: calculateAccuracy(),
-        userInput,
-      };
-      setTypingresult(result);
-      if (currentUser) {
-        saveResult(result);
-      }
-    }
-  }, [isComplete]);
 
   // Keyboard mapping for visual keyboard
   const keyboardRows = [

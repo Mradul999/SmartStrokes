@@ -85,6 +85,38 @@ const Header = () => {
           </NavLink>
 
           <div className="flex items-center gap-2 md:gap-4">
+            {/* About link - visible to all users */}
+            <NavLink 
+              to="/about" 
+              className={`flex items-center py-2 px-4 rounded-lg text-sm font-medium transition-all ${
+                scrolled 
+                  ? isActive("/about") 
+                    ? "bg-purple-600 text-white"
+                    : "bg-purple-50 text-purple-700 hover:bg-purple-100" 
+                  : isActive("/about")
+                    ? "bg-white text-purple-700"
+                    : "bg-purple-500/30 text-white hover:bg-purple-500/50"
+              }`}
+            >
+              About
+            </NavLink>
+            
+            {/* Contact link - visible to all users */}
+            <NavLink 
+              to="/contact" 
+              className={`flex items-center py-2 px-4 rounded-lg text-sm font-medium transition-all ${
+                scrolled 
+                  ? isActive("/contact") 
+                    ? "bg-purple-600 text-white"
+                    : "bg-purple-50 text-purple-700 hover:bg-purple-100" 
+                  : isActive("/contact")
+                    ? "bg-white text-purple-700"
+                    : "bg-purple-500/30 text-white hover:bg-purple-500/50"
+              }`}
+            >
+              Contact
+            </NavLink>
+            
             {!currentUser ? (
               <>
                 <NavLink 
@@ -198,6 +230,38 @@ const Header = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                         Practice Typing
+                      </NavLink>
+                      <NavLink
+                        to="/about"
+                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                        onClick={() => setShowMenu(false)}
+                      >
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          className="h-5 w-5 mr-3 text-gray-400" 
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        About Us
+                      </NavLink>
+                      <NavLink
+                        to="/contact"
+                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                        onClick={() => setShowMenu(false)}
+                      >
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          className="h-5 w-5 mr-3 text-gray-400" 
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Contact Us
                       </NavLink>
                     </div>
                     <div className="border-t border-gray-100">

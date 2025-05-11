@@ -37,6 +37,7 @@ const Dashboard = () => {
           `${import.meta.env.VITE_API_URL}/api/result/performance`,
           { withCredentials: true }
         );
+        console.log("Performance data received:", response.data);
         setPerformance(response.data);
       } catch (error) {
         console.error("Error fetching performance:", error);
@@ -261,7 +262,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {performance?.sessions && performance.sessions.length > 0 && (
+        {performance?.sessions && performance.sessions.length > 0 ? (
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 transform transition-all hover:shadow-xl">
             <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
               <svg
@@ -312,7 +313,7 @@ const Dashboard = () => {
                       <td className="py-4">
                         <div className="flex items-center">
                           <span className="text-lg font-semibold text-purple-600">
-                            {session.wpm}
+                            {session.wpm > 0 ? session.wpm : 'N/A'}
                           </span>
                           <span className="ml-1 text-sm text-gray-500">
                             WPM
@@ -322,7 +323,7 @@ const Dashboard = () => {
                       <td className="py-4">
                         <div className="flex items-center">
                           <span className="text-lg font-semibold text-blue-500">
-                            {session.accuracy}
+                            {session.accuracy > 0 ? session.accuracy : 'N/A'}
                           </span>
                           <span className="ml-1 text-sm text-gray-500">%</span>
                         </div>
@@ -348,6 +349,22 @@ const Dashboard = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 transform transition-all hover:shadow-xl text-center">
+            <div className="flex flex-col items-center justify-center py-8">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-purple-200 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">No Sessions Yet</h3>
+              <p className="text-gray-500 mb-6">Complete your first typing test to see your performance history here.</p>
+              <a href="/" className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg shadow-sm hover:bg-purple-700 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                </svg>
+                Start Typing Test
+              </a>
             </div>
           </div>
         )}
