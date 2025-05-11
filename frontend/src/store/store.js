@@ -6,6 +6,9 @@ const store = create(
     (set) => ({
       currentUser: null,
       isVerifying: false,
+      profileImage: null,
+
+      setProfileImage: (value) => set({ profileImage: value }),
       setVerifying: (value) => set({ isVerifying: value }),
       setCurrentUser: (user) => set({ currentUser: user }),
       logout: () => set({ currentUser: null }),

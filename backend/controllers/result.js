@@ -19,7 +19,8 @@ export const saveResult = async (req, res) => {
     // console.log("userid ", userId);
 
     const { wpm, sampleText, wrongKeyPresses, accuracy, userInput } = req.body;
-    
+    console.log("wpm", wpm);
+    console.log("sampleText", sampleText);
 
     console.log(wrongKeyPresses);
 
@@ -30,8 +31,8 @@ export const saveResult = async (req, res) => {
       textTyped: userInput,
       weakKeys: wrongKeyPresses,
       accuracy,
-      weakKeyStats: weakKeyStats || {},
-      createdAt: new Date()
+
+      createdAt: new Date(),
     });
     await result.save();
 
@@ -49,7 +50,9 @@ export const getUserPerformance = async (req, res) => {
     const token = req.cookies["access-token"];
 
     if (!token) {
-      return res.status(401).json({ message: "unauthorized: no token provided" });
+      return res
+        .status(401)
+        .json({ message: "unauthorized: no token provided" });
     }
 
     const decoded = jwt.verify(token, process.env.secret);
@@ -61,26 +64,35 @@ export const getUserPerformance = async (req, res) => {
       .limit(7);
 
     // Calculate average performance
-    const totalWpm = sessions.reduce((sum, session) => sum + Number(session.wpm), 0);
-    const totalAccuracy = sessions.reduce((sum, session) => sum + Number(session.accuracy), 0);
-    const averageWpm = sessions.length > 0 ? Math.round(totalWpm / sessions.length) : 0;
-    const averageAccuracy = sessions.length > 0 ? Math.round(totalAccuracy / sessions.length) : 0;
+    const totalWpm = sessions.reduce(
+      (sum, session) => sum + Number(session.wpm),
+      0
+    );
+    const totalAccuracy = sessions.reduce(
+      (sum, session) => sum + Number(session.accuracy),
+      0
+    );
+    const averageWpm =
+      sessions.length > 0 ? Math.round(totalWpm / sessions.length) : 0;
+    const averageAccuracy =
+      sessions.length > 0 ? Math.round(totalAccuracy / sessions.length) : 0;
 
     // Get most common weak keys with their counts
     const weakKeyStats = {};
-    
-    sessions.forEach(session => {
+
+    sessions.forEach((session) => {
       // Process the weak keys array
-      session.weakKeys.forEach(key => {
+      session.weakKeys.forEach((key) => {
         weakKeyStats[key] = (weakKeyStats[key] || 0) + 1;
       });
-      
+
       // Process the detailed statistics if available
       if (session.weakKeyStats) {
         const statsMap = session.weakKeyStats;
         // Convert Map to object if needed
-        const stats = statsMap instanceof Map ? Object.fromEntries(statsMap) : statsMap;
-        
+        const stats =
+          statsMap instanceof Map ? Object.fromEntries(statsMap) : statsMap;
+
         Object.entries(stats).forEach(([key, count]) => {
           weakKeyStats[key] = (weakKeyStats[key] || 0) + count;
         });
@@ -92,10 +104,10 @@ export const getUserPerformance = async (req, res) => {
       .slice(0, 5);
 
     // Ensure WPM and accuracy are numbers
-    const formattedSessions = sessions.map(session => ({
+    const formattedSessions = sessions.map((session) => ({
       ...session.toObject(),
       wpm: Number(session.wpm),
-      accuracy: Number(session.accuracy)
+      accuracy: Number(session.accuracy),
     }));
 
     res.status(200).json({
@@ -104,10 +116,15 @@ export const getUserPerformance = async (req, res) => {
       averageAccuracy,
       weakKeys: sortedWeakKeys.map(([key]) => key),
       weakKeyStats: Object.fromEntries(sortedWeakKeys),
-      totalSessions: sessions.length
+      totalSessions: sessions.length,
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "error in fetching user performance", error: error.message });
+    res
+      .status(500)
+      .json({
+        message: "error in fetching user performance",
+        error: error.message,
+      });
   }
 };
