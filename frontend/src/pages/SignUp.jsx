@@ -14,7 +14,7 @@ const Signup = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    profilePic: ""
+    profileImage: ""
   });
   const [error, setError] = useState("");
   const [avatarSeed, setAvatarSeed] = useState("");
@@ -43,7 +43,7 @@ const Signup = () => {
     
     // Create the modern DiceBear URL with v7.x API
     const avatarUrl = `https://api.dicebear.com/7.x/${randomStyle}/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
-    setFormData(prev => ({...prev, profilePic: avatarUrl}));
+    setFormData(prev => ({...prev, profileImage: avatarUrl}));
   };
 
   const handleChange = (e) =>
@@ -63,23 +63,35 @@ const Signup = () => {
       return;
     }
 
+    const submissionData = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      profilePic: formData.profileImage
+    };
+
     try {
+      console.log("Sending registration data:", submissionData);
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/signup`,
-        formData
+        submissionData
       );
 
       if (response.status === 200) {
+        console.log("Registration successful:", response.data);
         setError("");
         setLoading(false);
         setVerifying(true);
 
+        // Store email and profile image in session storage for OTP verification
         sessionStorage.setItem("email", formData.email);
+        sessionStorage.setItem("pendingProfileImage", formData.profileImage);
+        
         navigate("/otp-verification");
       }
     } catch (error) {
       setLoading(false);
-      console.log(error);
+      console.log("Registration error:", error);
       setError(error.response?.data?.message || "An error occurred during registration");
       return;
     }
@@ -113,7 +125,7 @@ const Signup = () => {
               : "border-4 border-purple-200"
           }`}>
             <img 
-              src={formData.profilePic || `https://api.dicebear.com/7.x/adventurer/svg?seed=default`}
+              src={formData.profileImage || `https://api.dicebear.com/7.x/adventurer/svg?seed=default`}
               alt="Avatar" 
               className="w-full h-full object-cover bg-white"
             />

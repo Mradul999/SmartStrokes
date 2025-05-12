@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const SignUp = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, profilePic } = req.body;
 
   try {
     const userExits = await User.findOne({ email });
@@ -26,6 +26,7 @@ export const SignUp = async (req, res) => {
       otp,
       isVerified: false,
       otpExpiresAt: otpExpiry,
+      profileImage: profilePic || "https://thumbs.dreamstime.com/b/modern-random-cartoon-sticker-detailed-illustrated-isolated-white-background-modern-random-cartoon-sticker-detailed-illustrated-353166857.jpg",
     });
     await newUser.save();
     await sendOTP(email, otp);
@@ -39,7 +40,7 @@ export const SignUp = async (req, res) => {
 };
 
 export const verifyOTP = async (req, res) => {
-  const { email, otp } = req.body;
+  const { email, otp, profileImage } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -57,9 +58,35 @@ export const verifyOTP = async (req, res) => {
 
     existingUser.isVerified = true;
     existingUser.otp = undefined;
+    
+    // Update profile image if provided during verification
+    if (profileImage) {
+      existingUser.profileImage = profileImage;
+    }
 
     await existingUser.save();
-    res.status(200).json({ message: "Email Verified .You can login now" });
+    
+    // Return the user data for auto-login
+    const token = jwt.sign({ id: existingUser._id }, process.env.secret, {
+      expiresIn: "1d",
+    });
+
+    res
+      .cookie("access-token", token, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      })
+      .status(200)
+      .json({ 
+        message: "Email Verified. You are now logged in.", 
+        user: {
+          _id: existingUser._id,
+          name: existingUser.name,
+          email: existingUser.email,
+          profileImage: existingUser.profileImage,
+          isVerified: existingUser.isVerified
+        }
+      });
   } catch (error) {
     console.log(error);
     res

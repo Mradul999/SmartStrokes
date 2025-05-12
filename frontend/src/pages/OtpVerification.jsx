@@ -1,90 +1,217 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import authStore from "../store/store.js";
+import { ThemeContext } from "../context/ThemeContext";
 
 const OTPVerification = () => {
-  const setVerifying = authStore((state) => state.setVerifying);
-  const isVerifying = authStore((state) => state.isVerifying);
-  const [otp, setOtp] = useState("");
-
+  const { theme } = useContext(ThemeContext);
+  const navigate = useNavigate();
+  const setCurrentUser = authStore((state) => state.setCurrentUser);
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // Get email from localStorage or props or route state
-  const email = sessionStorage.getItem("email");
-  const navigate = useNavigate();
+  const [countdown, setCountdown] = useState(300);
+  const [countdownActive, setCountdownActive] = useState(true);
 
   useEffect(() => {
-    if (!isVerifying) {
-      navigate("/signin");
+    // Get email from session storage
+    const storedEmail = sessionStorage.getItem("email");
+    if (!storedEmail) {
+      navigate("/signup");
+    } else {
+      setEmail(storedEmail);
     }
-  }, [isVerifying]);
 
-  const handleChange = (e) => {
-    setOtp(e.target.value);
+    // Set countdown timer
+    let timer;
+    if (countdownActive && countdown > 0) {
+      timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+    } else if (countdown === 0) {
+      setCountdownActive(false);
+    }
+
+    return () => clearTimeout(timer);
+  }, [countdown, countdownActive, navigate]);
+
+  const handleChange = (index, value) => {
+    // Only allow numbers
+    if (!/^\d*$/.test(value)) return;
+
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      document.getElementById(`otp-${index + 1}`).focus();
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+    setLoading(true);
+
+    const otpValue = otp.join("");
+    if (otpValue.length !== 6) {
+      setError("Please enter all 6 digits");
+      setLoading(false);
+      return;
+    }
 
     try {
+      // Get the saved profile image from sessionStorage
+      const pendingProfileImage = sessionStorage.getItem("pendingProfileImage");
+
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/verify`,
-        {
-          email,
-          otp,
-        }
+        { email, otp: otpValue, profileImage: pendingProfileImage }
       );
 
       if (response.status === 200) {
         setLoading(false);
-        setVerifying(false);
-
-        navigate("/signin");
+        
+        // Store the user data in state
+        setCurrentUser(response.data.user);
+        
+        // Clear session storage
+        sessionStorage.removeItem("email");
+        sessionStorage.removeItem("pendingProfileImage");
+        
+        // Navigate to dashboard
+        navigate("/dashboard");
       }
     } catch (error) {
       setLoading(false);
-      console.log(error);
-      setError(error.response.data.message);
+      console.error("OTP verification error:", error);
+      setError(error.response?.data?.message || "Invalid OTP, please try again");
     }
   };
 
+  const resendOtp = async () => {
+    setError("");
+    setLoading(true);
+
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/resend-otp`, {
+        email,
+      });
+      setLoading(false);
+      setCountdown(300);
+      setCountdownActive(true);
+    } catch (error) {
+      setLoading(false);
+      setError(error.response?.data?.message || "Failed to resend OTP");
+    }
+  };
+
+  // Format countdown time
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes < 10 ? "0" + minutes : minutes}:${remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds}`;
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-purple-100 to-blue-100 px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-xl shadow-md w-full max-w-md"
-      >
-        <h2 className="text-2xl font-bold text-center text-purple-600 mb-4">
-          OTP Verification
+    <div className={`min-h-screen flex items-center justify-center ${
+      theme === "dark" 
+        ? "bg-gradient-to-tr from-gray-900 to-purple-900"
+        : "bg-gradient-to-tr from-purple-100 to-blue-100"
+    } px-4 pt-20 pb-10`}>
+      <div className={`p-8 rounded-xl shadow-xl w-full max-w-md ${
+        theme === "dark" 
+          ? "bg-gray-800 border border-gray-700" 
+          : "bg-white"
+      }`}>
+        <h2 className={`text-2xl font-bold text-center mb-6 ${
+          theme === "dark" ? "text-purple-300" : "text-purple-600"
+        }`}>
+          Verify Your Email
         </h2>
-        <p className="text-center text-gray-500 mb-6">
-          Enter the 6-digit OTP sent to your email
+        
+        <p className={`text-center mb-6 ${
+          theme === "dark" ? "text-gray-300" : "text-gray-600"
+        }`}>
+          We've sent a 6-digit verification code to{" "}
+          <span className={`font-medium ${
+            theme === "dark" ? "text-gray-200" : "text-gray-800"
+          }`}>
+            {email}
+          </span>
         </p>
 
-        <input
-          type="text"
-          maxLength="6"
-          value={otp}
-          onChange={handleChange}
-          className="w-full border border-gray-300 px-4 py-2 text-center text-lg tracking-widest rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
-          placeholder="Enter OTP"
-          required
-        />
+        <form onSubmit={handleSubmit} className="mb-6">
+          <div className="flex justify-center gap-2 mb-6 flex-wrap">
+            {otp.map((digit, index) => (
+              <input
+                key={index}
+                id={`otp-${index}`}
+                type="text"
+                maxLength={1}
+                value={digit}
+                onChange={(e) => handleChange(index, e.target.value)}
+                className={`w-12 h-12 text-center text-xl font-bold rounded-lg focus:ring-2 ${
+                  theme === "dark"
+                    ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500"
+                    : "border border-gray-300 focus:border-purple-500 focus:ring-purple-400"
+                }`}
+              />
+            ))}
+          </div>
 
-        {error && <p className="text-red-500 text-center mt-2">{error}</p>}
+          {error && (
+            <div className={`mb-6 p-4 rounded-lg ${
+              theme === "dark" 
+                ? "bg-red-900/60 border border-red-800 text-red-200" 
+                : "bg-red-100 border border-red-400 text-red-600"
+            }`}>
+              {error}
+            </div>
+          )}
 
-        <button
-          type="submit"
-          className="mt-6 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition duration-200"
-        >
-          {loading ? <ClipLoader size={30} color="#fff" /> : "Verify OTP"}
-        </button>
-      </form>
+          <button
+            type="submit"
+            className={`w-full py-3 rounded-lg font-medium transition-colors flex justify-center items-center text-white ${
+              theme === "dark"
+                ? "bg-purple-600 hover:bg-purple-700"
+                : "bg-purple-600 hover:bg-purple-700"
+            }`}
+            disabled={loading}
+          >
+            {loading ? <ClipLoader size={24} color="#fff" /> : "Verify OTP"}
+          </button>
+        </form>
+
+        <div className="text-center">
+          <p className={`mb-3 text-sm ${
+            theme === "dark" ? "text-gray-400" : "text-gray-500"
+          }`}>
+            Didn't receive the code?{" "}
+            {countdownActive ? (
+              <span className={`font-medium ${
+                theme === "dark" ? "text-purple-400" : "text-purple-600"
+              }`}>
+                {formatTime(countdown)}
+              </span>
+            ) : (
+              <button
+                onClick={resendOtp}
+                disabled={loading}
+                className={`font-medium ${
+                  theme === "dark" ? "text-purple-400 hover:text-purple-300" : "text-purple-600 hover:text-purple-700"
+                }`}
+              >
+                Resend OTP
+              </button>
+            )}
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
