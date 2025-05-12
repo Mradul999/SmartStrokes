@@ -1,25 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import Header from "../components/Header";
 import { ClipLoader } from "react-spinners";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import authStore from "../store/store.js";
-
 import TypingresultStore from "../store/TypingResultStore.js";
 import { saveResult } from "../utils/saveResult.js";
+import { ThemeContext } from "../context/ThemeContext";
 
 const Signin = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { theme } = useContext(ThemeContext);
 
   const setCurrentUser = authStore((state) => state?.setCurrentUser);
-
   const typingResult = TypingresultStore((state) => state.typingResult);
-  console.log(typingResult);
-
   const navigate = useNavigate();
 
   const handleChange = (e) =>
@@ -39,10 +36,8 @@ const Signin = () => {
 
       if (response.status === 200) {
         setError("");
-        // console.log(response.data);
         setCurrentUser(response.data.existingUser);
         saveResult(typingResult);
-
         navigate("/");
       }
     } catch (error) {
@@ -54,32 +49,49 @@ const Signin = () => {
   };
 
   return (
-    <>
-      <Header />
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-purple-100 to-blue-100 px-4">
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-6 rounded-xl shadow-md w-full max-w-md"
-        >
-          <h2 className="text-2xl font-bold text-center text-purple-600 mb-4">
-            Welcome Back
-          </h2>
+    <div className={`min-h-screen flex items-center justify-center ${
+      theme === "dark" 
+        ? "bg-gradient-to-tr from-gray-900 to-purple-900"
+        : "bg-gradient-to-tr from-purple-100 to-blue-100"
+    } px-4 pt-20 pb-10`}>
+      <form
+        onSubmit={handleSubmit}
+        className={`p-8 rounded-xl shadow-xl w-full max-w-md ${
+          theme === "dark" 
+            ? "bg-gray-800 border border-gray-700" 
+            : "bg-white"
+        }`}
+      >
+        <h2 className={`text-2xl font-bold text-center mb-6 ${
+          theme === "dark" ? "text-purple-300" : "text-purple-600"
+        }`}>
+          Welcome Back
+        </h2>
 
-          <div className="mb-4">
-            <label className="block mb-1">Email</label>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              name="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
-            />
-          </div>
+        <div className="mb-4">
+          <label className={`block mb-2 font-medium ${
+            theme === "dark" ? "text-gray-200" : "text-gray-700"
+          }`}>Email</label>
+          <input
+            type="email"
+            placeholder="Enter your email"
+            name="email"
+            required
+            value={formData.email}
+            onChange={handleChange}
+            className={`w-full px-4 py-3 rounded-lg focus:ring-2 ${
+              theme === "dark" 
+                ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 placeholder-gray-400" 
+                : "border focus:ring-purple-400 placeholder-gray-400"
+            }`}
+          />
+        </div>
 
-          <div className="mb-6 relative">
-            <label className="block mb-1">Password</label>
+        <div className="mb-6 relative">
+          <label className={`block mb-2 font-medium ${
+            theme === "dark" ? "text-gray-200" : "text-gray-700"
+          }`}>Password</label>
+          <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               name="password"
@@ -87,31 +99,60 @@ const Signin = () => {
               required
               value={formData.password}
               onChange={handleChange}
-              className="w-full border px-3 py-2 rounded focus:ring-2 focus:ring-purple-400"
+              className={`w-full px-4 py-3 rounded-lg focus:ring-2 ${
+                theme === "dark" 
+                  ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 placeholder-gray-400" 
+                  : "border focus:ring-purple-400 placeholder-gray-400"
+              }`}
             />
             <span
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-9 cursor-pointer text-gray-500"
+              className={`absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer ${
+                theme === "dark" ? "text-gray-400" : "text-gray-500"
+              }`}
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </span>
           </div>
-          {error && (
-            <div className="mb-4 text-red-600 bg-red-100 border border-red-400 p-3 rounded">
-              {error}
-            </div>
-          )}
+        </div>
+        
+        {error && (
+          <div className={`mb-6 p-4 rounded-lg ${
+            theme === "dark" 
+              ? "bg-red-900/60 border border-red-800 text-red-200" 
+              : "bg-red-100 border border-red-400 text-red-600"
+          }`}>
+            {error}
+          </div>
+        )}
 
-          <button
-            type="submit"
-            className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition flex justify-center items-center"
-            disabled={loading}
+        <button
+          type="submit"
+          className={`w-full py-3 rounded-lg font-medium transition-colors flex justify-center items-center text-white ${
+            theme === "dark"
+              ? "bg-purple-600 hover:bg-purple-700"
+              : "bg-purple-600 hover:bg-purple-700"
+          }`}
+          disabled={loading}
+        >
+          {loading ? <ClipLoader size={24} color="#fff" /> : "Sign In"}
+        </button>
+        
+        <div className={`mt-6 text-center text-sm ${
+          theme === "dark" ? "text-gray-400" : "text-gray-600"
+        }`}>
+          Don't have an account?{" "}
+          <a 
+            href="/signup" 
+            className={`font-medium ${
+              theme === "dark" ? "text-purple-400 hover:text-purple-300" : "text-purple-600 hover:text-purple-700"
+            }`}
           >
-            {loading ? <ClipLoader size={30} color="#fff" /> : "Sign In"}
-          </button>
-        </form>
-      </div>
-    </>
+            Sign up
+          </a>
+        </div>
+      </form>
+    </div>
   );
 };
 

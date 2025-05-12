@@ -3,6 +3,7 @@ import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import authStore from "../store/store.js";
 import axios from "axios";
 import { ThemeContext } from "../context/ThemeContext";
+import ThemeToggle from "./ThemeToggle";
 
 const Header = () => {
   const { theme } = useContext(ThemeContext);
@@ -63,9 +64,13 @@ const Header = () => {
   // Determine header background based on theme and scroll state
   let headerBg;
   if (theme === "dark") {
-    headerBg = scrolled ? "bg-gray-800 shadow-md" : "bg-gradient-to-r from-purple-900 to-indigo-900";
+    headerBg = scrolled 
+      ? "bg-gray-800/95 backdrop-blur-sm border-b border-gray-700 shadow-lg shadow-black/20" 
+      : "bg-gradient-to-r from-gray-900 to-gray-800";
   } else {
-    headerBg = scrolled ? "bg-white shadow-md" : "bg-gradient-to-r from-purple-600 to-indigo-600";
+    headerBg = scrolled 
+      ? "bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg" 
+      : "bg-gradient-to-r from-purple-600 to-indigo-600";
   }
 
   // Determine text and link colors based on theme and scroll state
@@ -74,16 +79,16 @@ const Header = () => {
     : (scrolled ? "text-purple-600" : "text-white");
   
   const linkBgActive = theme === "dark"
-    ? (scrolled ? "bg-purple-700 text-white" : "bg-gray-800 text-purple-300")
-    : (scrolled ? "bg-purple-600 text-white" : "bg-white text-purple-700");
+    ? (scrolled ? "bg-purple-700 text-white" : "bg-gray-800/80 text-purple-300")
+    : (scrolled ? "bg-purple-600 text-white" : "bg-white/90 text-purple-700");
   
   const linkBgNormal = theme === "dark"
-    ? (scrolled ? "bg-gray-700 text-gray-200 hover:bg-gray-600" : "bg-purple-800/30 text-gray-200 hover:bg-purple-800/50")
-    : (scrolled ? "bg-purple-50 text-purple-700 hover:bg-purple-100" : "bg-purple-500/30 text-white hover:bg-purple-500/50");
+    ? (scrolled ? "bg-gray-700/80 text-gray-200 hover:bg-gray-600" : "bg-gray-800/50 text-gray-200 hover:bg-gray-800/70")
+    : (scrolled ? "bg-purple-50 text-purple-700 hover:bg-purple-100" : "bg-white/20 text-white hover:bg-white/30");
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBg} ${scrolled ? "py-3" : "py-4"}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBg} ${scrolled ? "py-2" : "py-3"}`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
@@ -106,6 +111,11 @@ const Header = () => {
           </NavLink>
 
           <div className="flex items-center gap-2 md:gap-4">
+            {/* Theme Toggle */}
+            <div className="mr-2">
+              <ThemeToggle size="sm" />
+            </div>
+
             {/* About link - visible to all users */}
             <NavLink 
               to="/about" 
@@ -142,8 +152,8 @@ const Header = () => {
                     isActive("/signin") 
                       ? linkBgActive
                       : (theme === "dark" 
-                         ? "bg-gray-700 text-gray-200 hover:bg-gray-600" 
-                         : (scrolled ? "bg-purple-100 text-purple-700 hover:bg-purple-200" : "bg-white/90 text-purple-700 hover:bg-white"))
+                         ? (scrolled ? "bg-purple-700/90 text-white hover:bg-purple-600" : "bg-purple-700/80 text-white hover:bg-purple-600") 
+                         : (scrolled ? "bg-purple-600 text-white hover:bg-purple-700" : "bg-white/90 text-purple-700 hover:bg-white"))
                   }`}
                 >
                   Sign In
@@ -154,8 +164,8 @@ const Header = () => {
                 <div
                   className={`flex items-center gap-3 cursor-pointer py-1.5 px-3 rounded-lg ${
                     theme === "dark" 
-                      ? (scrolled ? "hover:bg-gray-700" : "hover:bg-purple-800/30")
-                      : (scrolled ? "hover:bg-gray-100" : "hover:bg-purple-500/30")
+                      ? (scrolled ? "hover:bg-gray-700/70" : "hover:bg-gray-800/60")
+                      : (scrolled ? "hover:bg-gray-100" : "hover:bg-white/20")
                   }`}
                   onClick={() => setShowMenu((prev) => !prev)}
                 >
@@ -185,13 +195,13 @@ const Header = () => {
                       className="rounded-full w-full h-full object-cover border-2 shadow-sm"
                       style={{ 
                         borderColor: theme === "dark" 
-                          ? (scrolled ? "#374151" : "#4B5563") 
+                          ? (scrolled ? "#374151" : "#1f2937") 
                           : (scrolled ? "#e5e7eb" : "#ffffff") 
                       }}
                     />
                     <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 bg-green-400 ${
                       theme === "dark" 
-                        ? (scrolled ? "border-gray-800" : "border-purple-900") 
+                        ? (scrolled ? "border-gray-800" : "border-gray-900") 
                         : (scrolled ? "border-white" : "border-purple-600")
                     }`}></div>
                   </div>
@@ -199,7 +209,9 @@ const Header = () => {
 
                 {showMenu && (
                   <div className={`absolute right-0 mt-2 w-56 ${
-                    theme === "dark" ? "bg-gray-800 shadow-lg border border-gray-700" : "bg-white shadow-lg border border-gray-100"
+                    theme === "dark" 
+                      ? "bg-gray-800 shadow-lg shadow-black/50 border border-gray-700" 
+                      : "bg-white shadow-lg border border-gray-100"
                   } rounded-xl overflow-hidden z-50`}>
                     <div className={`p-3 ${theme === "dark" ? "border-b border-gray-700" : "border-b border-gray-100"}`}>
                       <div className="flex items-center gap-3">

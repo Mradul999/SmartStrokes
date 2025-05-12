@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import authStore from "../store/store.js";
 import { useRef } from "react";
+import { ThemeContext } from "../context/ThemeContext";
 
 const Dashboard = () => {
+  const { theme } = useContext(ThemeContext);
   const currentUser = authStore((state) => state.currentUser);
   const setProfileImage = authStore((state) => state.setProfileImage);
   const profileImage = authStore((state) => state.profileImage);
@@ -51,11 +53,19 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-50">
+      <div className={`min-h-screen flex items-center justify-center ${
+        theme === "dark" 
+          ? "bg-gray-900" 
+          : "bg-gradient-to-br from-purple-50 to-indigo-50"
+      }`}>
         <div className="relative">
-          <div className="h-24 w-24 rounded-full border-t-4 border-b-4 border-purple-600 animate-spin"></div>
+          <div className={`h-24 w-24 rounded-full border-t-4 border-b-4 ${
+            theme === "dark" ? "border-purple-500" : "border-purple-600"
+          } animate-spin`}></div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-purple-600 text-lg font-medium">Loading</span>
+            <span className={`text-lg font-medium ${
+              theme === "dark" ? "text-purple-400" : "text-purple-600"
+            }`}>Loading</span>
           </div>
         </div>
       </div>
@@ -74,12 +84,24 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 py-8">
+    <div className={`min-h-screen ${
+      theme === "dark" 
+        ? "bg-gradient-to-br from-gray-900 to-gray-800" 
+        : "bg-gradient-to-br from-purple-50 to-indigo-50"
+    } py-8`}>
       <div className="max-w-6xl mx-auto px-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 transform transition-all hover:shadow-2xl">
+        <div className={`${
+          theme === "dark" 
+            ? "bg-gray-800 border border-gray-700" 
+            : "bg-white"
+        } rounded-2xl shadow-xl p-8 mb-8 transform transition-all hover:shadow-2xl`}>
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             <div className="relative">
-              <div className="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-purple-200 shadow-md">
+              <div className={`w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden ${
+                theme === "dark" 
+                  ? "border-4 border-gray-700 shadow-lg shadow-black/20" 
+                  : "border-4 border-purple-200 shadow-md"
+              }`}>
                 <img
                   src={currentUser?.profileImage}
                   alt="Profile"
@@ -88,7 +110,11 @@ const Dashboard = () => {
               </div>
               <div
                 onClick={handleEditClick}
-                className="absolute -bottom-2 -right-2 bg-purple-600 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-md"
+                className={`absolute -bottom-2 -right-2 ${
+                  theme === "dark" 
+                    ? "bg-purple-600 text-white" 
+                    : "bg-purple-600 text-white"
+                } rounded-full w-10 h-10 flex items-center justify-center shadow-md cursor-pointer hover:opacity-90 transition-opacity`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -114,14 +140,26 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="text-center md:text-left">
-              <h1 className="text-3xl font-bold text-gray-800 mb-1">
+              <h1 className={`text-3xl font-bold mb-1 ${
+                theme === "dark" ? "text-gray-100" : "text-gray-800"
+              }`}>
                 {currentUser?.name}
               </h1>
-              <p className="text-gray-500 mb-3">{currentUser?.email}</p>
-              <div className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
+              <p className={`mb-3 ${
+                theme === "dark" ? "text-gray-400" : "text-gray-500"
+              }`}>{currentUser?.email}</p>
+              <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${
+                theme === "dark" 
+                  ? "bg-purple-900/70 text-purple-300" 
+                  : "bg-purple-100 text-purple-700"
+              }`}>
                 <span className="mr-1">⭐</span>
                 <span className="font-semibold">SmartStrokes</span>
-                <span className="ml-1 text-xs bg-purple-200 px-2 py-0.5 rounded-full">
+                <span className={`ml-1 text-xs px-2 py-0.5 rounded-full ${
+                  theme === "dark" 
+                    ? "bg-purple-800 text-purple-200" 
+                    : "bg-purple-200 text-purple-800"
+                }`}>
                   Level{" "}
                   {Math.max(1, Math.floor((performance?.averageWpm || 0) / 10))}
                 </span>
@@ -131,25 +169,39 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl">
+          <div className={`${
+            theme === "dark" 
+              ? "bg-gray-800 border border-gray-700" 
+              : "bg-white"
+          } rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl`}>
             <div className="flex items-start justify-between">
-    <div>
-                <p className="text-lg font-semibold text-gray-600 mb-1">
+              <div>
+                <p className={`text-lg font-semibold mb-1 ${
+                  theme === "dark" ? "text-gray-300" : "text-gray-600"
+                }`}>
                   Average Speed
                 </p>
                 <div className="flex items-baseline">
-                  <h3 className="text-4xl font-bold text-purple-600">
+                  <h3 className={`text-4xl font-bold ${
+                    theme === "dark" ? "text-purple-400" : "text-purple-600"
+                  }`}>
                     {performance?.averageWpm || 0}
                   </h3>
-                  <span className="ml-1 text-xl font-medium text-gray-500">
+                  <span className={`ml-1 text-xl font-medium ${
+                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                  }`}>
                     WPM
                   </span>
                 </div>
               </div>
-              <div className="p-3 bg-purple-100 rounded-full">
+              <div className={`p-3 rounded-full ${
+                theme === "dark" ? "bg-purple-900/50" : "bg-purple-100"
+              }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-7 w-7 text-purple-600"
+                  className={`h-7 w-7 ${
+                    theme === "dark" ? "text-purple-400" : "text-purple-600"
+                  }`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -163,9 +215,15 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <div className="mt-4 h-2 bg-purple-100 rounded-full overflow-hidden">
+            <div className={`mt-4 h-2 rounded-full overflow-hidden ${
+              theme === "dark" ? "bg-purple-900/30" : "bg-purple-100"
+            }`}>
               <div
-                className="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full"
+                className={`h-full rounded-full ${
+                  theme === "dark" 
+                    ? "bg-gradient-to-r from-purple-500/80 to-purple-400/80" 
+                    : "bg-gradient-to-r from-purple-400 to-purple-600"
+                }`}
                 style={{
                   width: `${Math.min(
                     100,
@@ -176,25 +234,39 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl">
+          <div className={`${
+            theme === "dark" 
+              ? "bg-gray-800 border border-gray-700" 
+              : "bg-white"
+          } rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl`}>
             <div className="flex items-start justify-between">
-        <div>
-                <p className="text-lg font-semibold text-gray-600 mb-1">
+              <div>
+                <p className={`text-lg font-semibold mb-1 ${
+                  theme === "dark" ? "text-gray-300" : "text-gray-600"
+                }`}>
                   Accuracy
                 </p>
                 <div className="flex items-baseline">
-                  <h3 className="text-4xl font-bold text-blue-500">
+                  <h3 className={`text-4xl font-bold ${
+                    theme === "dark" ? "text-blue-400" : "text-blue-500"
+                  }`}>
                     {performance?.averageAccuracy || 0}
                   </h3>
-                  <span className="ml-1 text-xl font-medium text-gray-500">
+                  <span className={`ml-1 text-xl font-medium ${
+                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                  }`}>
                     %
                   </span>
                 </div>
               </div>
-              <div className="p-3 bg-blue-100 rounded-full">
+              <div className={`p-3 rounded-full ${
+                theme === "dark" ? "bg-blue-900/50" : "bg-blue-100"
+              }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-7 w-7 text-blue-500"
+                  className={`h-7 w-7 ${
+                    theme === "dark" ? "text-blue-400" : "text-blue-500"
+                  }`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -208,33 +280,53 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <div className="mt-4 h-2 bg-blue-100 rounded-full overflow-hidden">
+            <div className={`mt-4 h-2 rounded-full overflow-hidden ${
+              theme === "dark" ? "bg-blue-900/30" : "bg-blue-100"
+            }`}>
               <div
-                className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full"
+                className={`h-full rounded-full ${
+                  theme === "dark" 
+                    ? "bg-gradient-to-r from-blue-500/80 to-blue-400/80" 
+                    : "bg-gradient-to-r from-blue-400 to-blue-600"
+                }`}
                 style={{ width: `${performance?.averageAccuracy || 0}%` }}
               ></div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl">
+          <div className={`${
+            theme === "dark" 
+              ? "bg-gray-800 border border-gray-700" 
+              : "bg-white"
+          } rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl`}>
             <div className="flex items-start justify-between">
-        <div>
-                <p className="text-lg font-semibold text-gray-600 mb-1">
-                  Total Sessions
+              <div>
+                <p className={`text-lg font-semibold mb-1 ${
+                  theme === "dark" ? "text-gray-300" : "text-gray-600"
+                }`}>
+                  Total Tests
                 </p>
                 <div className="flex items-baseline">
-                  <h3 className="text-4xl font-bold text-green-500">
-                    {performance?.totalSessions || 0}
+                  <h3 className={`text-4xl font-bold ${
+                    theme === "dark" ? "text-indigo-400" : "text-indigo-600"
+                  }`}>
+                    {performance?.totalTests || performance?.totalSessions || 0}
                   </h3>
-                  <span className="ml-1 text-xl font-medium text-gray-500">
+                  <span className={`ml-1 text-xl font-medium ${
+                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                  }`}>
                     tests
                   </span>
                 </div>
               </div>
-              <div className="p-3 bg-green-100 rounded-full">
+              <div className={`p-3 rounded-full ${
+                theme === "dark" ? "bg-indigo-900/50" : "bg-indigo-100"
+              }`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-7 w-7 text-green-500"
+                  className={`h-7 w-7 ${
+                    theme === "dark" ? "text-indigo-400" : "text-indigo-600"
+                  }`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -243,18 +335,24 @@ const Dashboard = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                   />
                 </svg>
               </div>
             </div>
-            <div className="mt-4 h-2 bg-green-100 rounded-full overflow-hidden">
+            <div className={`mt-4 h-2 rounded-full overflow-hidden ${
+              theme === "dark" ? "bg-indigo-900/30" : "bg-indigo-100"
+            }`}>
               <div
-                className="h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full"
+                className={`h-full rounded-full ${
+                  theme === "dark" 
+                    ? "bg-gradient-to-r from-indigo-500/80 to-indigo-400/80" 
+                    : "bg-gradient-to-r from-indigo-400 to-indigo-600"
+                }`}
                 style={{
                   width: `${Math.min(
                     100,
-                    (performance?.totalSessions || 0) * 10
+                    ((performance?.totalTests || performance?.totalSessions || 0) / 100) * 100
                   )}%`,
                 }}
               ></div>
@@ -426,9 +524,9 @@ const Dashboard = () => {
                         </div>
                       )
                     )}
-        </div>
-        </div>
-        <div>
+                  </div>
+                </div>
+                <div>
                   <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -511,7 +609,7 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-        </div>
+            </div>
           )}
       </div>
     </div>
