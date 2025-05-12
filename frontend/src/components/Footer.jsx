@@ -16,9 +16,9 @@ const Footer = () => {
   };
 
   const socialMediaLinks = {
-    twitter: "https://twitter.com/smartstrokes",
-    facebook: "https://facebook.com/smartstrokes",
-    instagram: "https://instagram.com/smartstrokes",
+    twitter: "#",
+    facebook: "#",
+    instagram: "#",
   };
 
   return (

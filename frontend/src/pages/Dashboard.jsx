@@ -7,12 +7,11 @@ import { ThemeContext } from "../context/ThemeContext";
 const Dashboard = () => {
   const { theme } = useContext(ThemeContext);
   const currentUser = authStore((state) => state.currentUser);
-  const setProfileImage = authStore((state) => state.setProfileImage);
-  const profileImage = authStore((state) => state.profileImage);
+  const setCurrentUser = authStore((state) => state.setCurrentUser);
   const [performance, setPerformance] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  console.log(currentUser.profileImage);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
 
   const fileInputRef = useRef(null);
 
@@ -22,14 +21,63 @@ const Dashboard = () => {
     }
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      console.log("file", file);
+    if (!file) return;
+    
+    // Check file type
+    if (!file.type.match('image.*')) {
+      setUploadError("Please select an image file");
+      return;
     }
-
+    
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("Image size should be less than 5MB");
+      return;
+    }
+    
+    setUploading(true);
+    setUploadError(null);
+    
     try {
-    } catch (error) {}
+      // Create form data for file upload
+      const formData = new FormData();
+      formData.append('profileImage', file);
+      
+      // Send request to update profile image
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/users/update-profile-image`,
+        formData,
+        { 
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      
+      if (response.data && response.data.user) {
+        // Update the user in state with new profile image
+        setCurrentUser({
+          ...currentUser,
+          profileImage: response.data.user.profileImage
+        });
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      setUploadError(error.response?.data?.message || "Failed to upload image");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Generate a random avatar from DiceBear if no profile image exists
+  const getDefaultAvatar = () => {
+    // Random seed to generate different avatars
+    const seed = currentUser?.name || currentUser?.email || Math.random().toString(36).substring(2, 8);
+    // Using the latest DiceBear API (version 7.x)
+    return `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
   };
 
   useEffect(() => {
@@ -103,7 +151,7 @@ const Dashboard = () => {
                   : "border-4 border-purple-200 shadow-md"
               }`}>
                 <img
-                  src={currentUser?.profileImage}
+                  src={currentUser?.profileImage || getDefaultAvatar()}
                   alt="Profile"
                   className="w-full h-full object-cover"              
                 />
@@ -116,20 +164,24 @@ const Dashboard = () => {
                     : "bg-purple-600 text-white"
                 } rounded-full w-10 h-10 flex items-center justify-center shadow-md cursor-pointer hover:opacity-90 transition-opacity`}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                  />
-                </svg>
+                {uploading ? (
+                  <div className="h-5 w-5 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                    />
+                  </svg>
+                )}
                 <input
                   type="file"
                   accept="image/*"
@@ -148,6 +200,11 @@ const Dashboard = () => {
               <p className={`mb-3 ${
                 theme === "dark" ? "text-gray-400" : "text-gray-500"
               }`}>{currentUser?.email}</p>
+              {uploadError && (
+                <p className={`mb-3 text-sm ${
+                  theme === "dark" ? "text-red-300" : "text-red-500"
+                }`}>{uploadError}</p>
+              )}
               <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${
                 theme === "dark" 
                   ? "bg-purple-900/70 text-purple-300" 
