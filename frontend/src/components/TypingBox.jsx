@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import sampleParagraphs from "../data.json";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
@@ -8,6 +8,7 @@ import auhtStore from "../store/store.js";
 import { NavLink } from "react-router-dom";
 import { saveResult } from "../utils/saveResult.js";
 import TypingresultStore from "../store/TypingResultStore.js";
+import { ThemeContext } from "../context/ThemeContext";
 
 const TypingBox = () => {
   const [userInput, setUserInput] = useState("");
@@ -25,18 +26,25 @@ const TypingBox = () => {
   const [liveAccuracy, setLiveAccuracy] = useState(100);
   const [cursorPosition, setCursorPosition] = useState(0);
   const [showKeyboard, setShowKeyboard] = useState(false);
+  const [fadeIn, setFadeIn] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [visibleLineStart, setVisibleLineStart] = useState(0);
+  const [linesPerView, setLinesPerView] = useState(3);
 
-  const inputRef = useRef(null);
+  const textBoxRef = useRef(null);
   const timerRef = useRef(null);
   const livePerfRef = useRef(null);
   const textDisplayRef = useRef(null);
 
   const currentUser = auhtStore((state) => state.currentUser);
   const setTypingresult = TypingresultStore((state) => state.setTypingresult);
+  const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
     setRandomParagraph();
-    inputRef.current.focus();
+    setTimeout(() => {
+      setFadeIn(true);
+    }, 100);
   }, []);
 
   const reset = () => {
@@ -51,14 +59,33 @@ const TypingBox = () => {
     setIsComplete(false);
     setWrongKeyPresses([]);
     setWeakKeyStats({});
-    inputRef.current.focus();
+    setVisibleLineStart(0);
+    if (textBoxRef.current) {
+      textBoxRef.current.focus();
+    }
   };
 
   const setRandomParagraph = () => {
     const randomIndex = Math.floor(
       Math.random() * sampleParagraphs.paragraphs.length
     );
-    const newText = sampleParagraphs.paragraphs[randomIndex];
+    let originalText = sampleParagraphs.paragraphs[randomIndex];
+    
+    // If the paragraph is too short, concatenate multiple paragraphs
+    while (originalText.split(' ').length < 250) {
+      const nextRandomIndex = Math.floor(
+        Math.random() * sampleParagraphs.paragraphs.length
+      );
+      originalText += " " + sampleParagraphs.paragraphs[nextRandomIndex];
+    }
+    
+    // Limit to around 300 words
+    const words = originalText.split(' ');
+    const shortenedWords = words.length > 300 ? words.slice(0, 300) : words;
+    
+    // Join back into a paragraph
+    const newText = shortenedWords.join(' ');
+    
     setSampleText(newText);
     setSampleWords(newText.split(" "));
     reset();
@@ -71,7 +98,7 @@ const TypingBox = () => {
           if (prev <= 1) {
             clearInterval(timerRef.current);
             setIsComplete(true);
-            inputRef.current.blur();
+            textBoxRef.current.blur();
             return 0;
           }
           return prev - 1;
@@ -153,33 +180,91 @@ const TypingBox = () => {
         saveResult(result);
       }
     }
-
-    // Scroll to keep cursor visible
-    if (textDisplayRef.current) {
-      const textContainer = textDisplayRef.current;
-      const cursorElement = textContainer.querySelector('.cursor-position');
-      
-      if (cursorElement) {
-        const containerRect = textContainer.getBoundingClientRect();
-        const cursorRect = cursorElement.getBoundingClientRect();
-        
-        // If cursor is outside visible area, scroll to make it visible
-        if (cursorRect.bottom > containerRect.bottom || cursorRect.top < containerRect.top) {
-          cursorElement.scrollIntoView({ block: 'center' });
-        }
-      }
-    }
   }, [userInput, startTime, isComplete, timeLeft]);
 
-  const handleInputChange = (e) => {
-    if (isComplete || timeLeft <= 0) return;
+  // Add this useEffect to handle line advancement
+  useEffect(() => {
+    if (!startTime || isComplete) return;
 
-    const value = e.target.value;
-    if (value.length > sampleText.length) return;
+    // Get the current position within the formatted text
+    const words = sampleText.split(' ');
+    const lines = [];
+    for (let i = 0; i < words.length; i += 10) {
+      lines.push(words.slice(i, i + 10));
+    }
 
-    if (value.length > userInput.length) {
-      const currentPosition = value.length - 1;
-      const lastChar = value[currentPosition];
+    // Determine which line we're on based on cursor position
+    const currentCharIndex = userInput.length;
+    let charCount = 0;
+    let currentLineIndex = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      const lineLength = lines[i].join(' ').length + (i > 0 ? 1 : 0);
+      charCount += lineLength;
+      
+      if (charCount > currentCharIndex) {
+        currentLineIndex = i;
+        break;
+      }
+    }
+
+    // Advance the visible lines if needed
+    if (currentLineIndex >= visibleLineStart + linesPerView - 1) {
+      setVisibleLineStart(currentLineIndex - linesPerView + 2);
+    }
+  }, [userInput, sampleText, visibleLineStart, linesPerView, startTime, isComplete]);
+
+  const handleKeyDown = (e) => {
+    if (isComplete || timeLeft <= 0) {
+      e.preventDefault();
+      return;
+    }
+
+    // Handle Tab key for reset
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      setRandomParagraph();
+      return;
+    }
+
+    // Handle Enter key for completion
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      setIsComplete(true);
+      clearInterval(timerRef.current);
+      clearInterval(livePerfRef.current);
+      return;
+    }
+
+    // Handle Backspace
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      if (userInput.length > 0) {
+        setUserInput(userInput.slice(0, -1));
+        setCursorPosition(cursorPosition - 1);
+      }
+      return;
+    }
+
+    // Only accept printable characters (length of 1) and not control keys
+    if (e.key.length === 1) {
+      e.preventDefault();
+      
+      // Start timer on first keystroke
+      if (userInput.length === 0 && !startTime) {
+        setStartTime(Date.now());
+      }
+
+      // Don't allow typing beyond the sample text length
+      if (userInput.length >= sampleText.length) {
+        return;
+      }
+
+      const newValue = userInput + e.key;
+      
+      // Check if character is correct
+      const currentPosition = newValue.length - 1;
+      const lastChar = e.key;
       const correspondingChar = sampleText[currentPosition];
 
       if (lastChar !== correspondingChar) {
@@ -190,78 +275,130 @@ const TypingBox = () => {
           [correspondingChar]: (prev[correspondingChar] || 0) + 1
         }));
       }
-    }
 
-    setUserInput(value);
-    const spaceCount = (value.match(/ /g) || []).length;
-    const newWordIndex = Math.min(spaceCount, sampleWords.length - 1);
-    setCurrentWordIndex(newWordIndex);
+      setUserInput(newValue);
+      setCursorPosition(newValue.length);
 
-    if (value === sampleText) {
-      setIsComplete(true);
-      inputRef.current.blur();
-      clearInterval(timerRef.current);
-      clearInterval(livePerfRef.current);
+      // Update word index based on spaces
+      const spaceCount = (newValue.match(/ /g) || []).length;
+      const newWordIndex = Math.min(spaceCount, sampleWords.length - 1);
+      setCurrentWordIndex(newWordIndex);
+
+      // Check if typing is complete
+      if (newValue === sampleText) {
+        setIsComplete(true);
+        clearInterval(timerRef.current);
+        clearInterval(livePerfRef.current);
+      }
     }
   };
 
   const calculateAccuracy = () => {
-    if (!userInput) return 100;
-
+    if (userInput.length === 0) return 100;
+    
     let correctChars = 0;
-    let totalChars = 0;
-
-    for (let i = 0; i < userInput.length; i++) {
-      totalChars++;
+    const minLength = Math.min(userInput.length, sampleText.length);
+    
+    for (let i = 0; i < minLength; i++) {
       if (userInput[i] === sampleText[i]) {
         correctChars++;
       }
     }
-
-    return totalChars > 0
-      ? Math.round((correctChars / totalChars) * 100)
-      : 100;
+    
+    return Math.floor((correctChars / userInput.length) * 100);
   };
 
   const renderText = () => {
-    const characters = sampleText.split('');
+    // First, split sample text into words
+    const words = sampleText.split(' ');
+    
+    // Group words into lines of 10 words each
+    const lines = [];
+    for (let i = 0; i < words.length; i += 10) {
+      lines.push(words.slice(i, i + 10));
+    }
+    
+    // Only display the current visible lines based on visibleLineStart
+    const visibleLines = lines.slice(
+      visibleLineStart, 
+      visibleLineStart + linesPerView
+    );
+    
+    const currentIndex = userInput.length;
     
     return (
-      <div className="relative leading-relaxed tracking-wide">
-        {characters.map((char, index) => {
-          // Determine char state: cursor, correct, incorrect, or untyped
-          const isCursor = index === cursorPosition;
-          const isTyped = index < userInput.length;
-          const isCorrect = isTyped && userInput[index] === char;
-          const isError = isTyped && userInput[index] !== char;
-          
-          // Assign appropriate styling based on the character's state
-          let charClass = 'font-mono text-lg md:text-xl';
-          
-          if (isCursor) {
-            charClass += ' cursor-position relative';
-          }
-          
-          if (isTyped) {
-            charClass += isCorrect ? ' text-green-600' : ' text-red-500';
-          } else {
-            charClass += ' text-gray-500';
-          }
-          
-          // Apply special styling to spaces for better visibility
-          if (char === ' ') {
-            charClass += ' space-char';
-          }
+      <div className="relative text-lg md:text-xl lg:text-2xl leading-relaxed font-mono tracking-wide">
+        {visibleLines.map((line, lineIndex) => {
+          const actualLineIndex = lineIndex + visibleLineStart;
           
           return (
-            <span key={index} className={charClass}>
-              {char === ' ' ? '\u00A0' : char}
-              {isCursor && (
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-600 animate-pulse"></span>
-              )}
-            </span>
+            <div key={actualLineIndex} className="mb-6">
+              {line.map((word, wordIndex) => {
+                // Calculate absolute position of this word in the original text
+                const previousLines = lines.slice(0, actualLineIndex).flat();
+                const wordsBeforeInText = [...previousLines, ...line.slice(0, wordIndex)];
+                const charsBeforeWord = wordsBeforeInText.join(' ').length + (wordsBeforeInText.length > 0 ? 1 : 0);
+                
+                // Word start/end positions in the full text
+                const wordStart = charsBeforeWord;
+                const wordEnd = wordStart + word.length;
+                
+                // Determine if this word is the active word
+                const isActiveWord = currentIndex >= wordStart && currentIndex <= wordEnd;
+                
+                return (
+                  <span 
+                    key={wordIndex} 
+                    className={`inline-block relative mr-2 ${isActiveWord ? 'active-word' : ''}`}
+                  >
+                    {Array.from(word).map((char, charIndex) => {
+                      const absoluteIndex = wordStart + charIndex;
+                      const isCursor = absoluteIndex === cursorPosition;
+                      const isTyped = absoluteIndex < userInput.length;
+                      const isCorrect = isTyped && userInput[absoluteIndex] === char;
+                      const isError = isTyped && userInput[absoluteIndex] !== char;
+                      
+                      // Apply appropriate styling
+                      let charClass = "transition-all duration-100 relative ";
+                      
+                      if (isTyped) {
+                        if (isCorrect) {
+                          charClass += theme === "dark" 
+                            ? "text-green-400 font-bold"
+                            : "text-green-600 font-bold";
+                        } else {
+                          charClass += theme === "dark" 
+                            ? "text-red-400 bg-red-900/30 rounded" 
+                            : "text-red-600 bg-red-100 rounded";
+                        }
+                      } else {
+                        charClass += theme === "dark" 
+                          ? "text-gray-600" 
+                          : "text-gray-400";
+                      }
+                      
+                      return (
+                        <span key={charIndex} className={charClass}>
+                          {char}
+                          {isCursor && (
+                            <span className="absolute -bottom-1 left-0 h-1 w-full bg-purple-500 animate-pulse"></span>
+                          )}
+                        </span>
+                      );
+                    })}
+                  </span>
+                );
+              })}
+            </div>
           );
         })}
+        
+        {/* Show progress indicator at the bottom */}
+        <div className={`text-xs font-medium mt-2 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
+          {visibleLineStart > 0 && "..."} 
+          Lines {visibleLineStart + 1}-{Math.min(visibleLineStart + linesPerView, lines.length)} of {lines.length}
+          {visibleLineStart + linesPerView < lines.length && "..."}
+        </div>
       </div>
     );
   };
@@ -352,21 +489,73 @@ const TypingBox = () => {
     );
   };
 
+  // Add this function to calculate the overall typing skill level
+  const calculateSkillLevel = () => {
+    // Only calculate if we have completed a test
+    if (!isComplete && timeLeft > 0) return "Beginner";
+    
+    const accuracy = calculateAccuracy();
+    
+    // Base the skill level on a combination of WPM and accuracy
+    // This creates a weighted score where accuracy is heavily valued
+    const weightedScore = (wpm * (accuracy / 100));
+    
+    if (weightedScore >= 90) return "Master";
+    if (weightedScore >= 70) return "Expert";
+    if (weightedScore >= 50) return "Advanced";
+    if (weightedScore >= 30) return "Intermediate";
+    if (weightedScore >= 15) return "Improving";
+    return "Beginner";
+  };
+  
+  // Add function to get skill level color
+  const getSkillLevelColor = () => {
+    const level = calculateSkillLevel();
+    
+    if (theme === "dark") {
+      switch (level) {
+        case "Master": return "text-yellow-300";
+        case "Expert": return "text-purple-400";
+        case "Advanced": return "text-blue-400";
+        case "Intermediate": return "text-green-400";
+        case "Improving": return "text-indigo-400";
+        default: return "text-gray-300";
+      }
+    } else {
+      switch (level) {
+        case "Master": return "text-yellow-600";
+        case "Expert": return "text-purple-600";
+        case "Advanced": return "text-blue-600";
+        case "Intermediate": return "text-green-600";
+        case "Improving": return "text-indigo-600";
+        default: return "text-gray-600";
+      }
+    }
+  };
+
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-6 font-sans mt-8">
+    <div className={`max-w-4xl mx-auto p-4 md:p-6 font-sans transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'} ${theme === "dark" ? "text-white" : ""}`}>
       <div className="text-center mb-8">
         <h1 className="text-3xl md:text-4xl text-center font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2">
           Speed Typing Test
         </h1>
-        <p className="text-gray-500">Improve your typing speed and accuracy with practice</p>
+        <p className={`${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+          Improve your typing speed and accuracy with practice
+        </p>
       </div>
 
       {/* Live Stats Bar */}
-      <div className="bg-white shadow-lg rounded-xl mb-6 p-4 flex justify-between items-center border border-gray-100">
+      <div className={`shadow-lg rounded-xl mb-6 p-4 flex justify-between items-center ${
+        theme === "dark" ? "bg-gray-800 border border-gray-700" : "bg-white border border-gray-100"
+      }`}>
         <div className="flex items-center space-x-4">
           <div className="flex flex-col items-center">
-            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Time</div>
-            <div className={`text-2xl font-bold flex items-center ${timeLeft < 10 ? "text-red-500" : "text-gray-700"}`}>
+            <div className={`text-xs uppercase tracking-wide mb-1 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Time</div>
+            <div className={`text-2xl font-bold flex items-center ${
+              timeLeft < 10 
+                ? "text-red-500" 
+                : theme === "dark" ? "text-white" : "text-gray-700"
+            }`}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -374,25 +563,25 @@ const TypingBox = () => {
             </div>
           </div>
           
-          <div className="h-12 w-0.5 bg-gray-200"></div>
+          <div className={`h-12 w-0.5 ${theme === "dark" ? "bg-gray-700" : "bg-gray-200"}`}></div>
           
           <div className="flex flex-col items-center">
-            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">WPM</div>
+            <div className={`text-xs uppercase tracking-wide mb-1 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>WPM</div>
             <div className="text-2xl font-bold text-purple-600">{startTime ? liveWpm : "-"}</div>
           </div>
           
-          <div className="h-12 w-0.5 bg-gray-200"></div>
+          <div className={`h-12 w-0.5 ${theme === "dark" ? "bg-gray-700" : "bg-gray-200"}`}></div>
           
           <div className="flex flex-col items-center">
-            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Accuracy</div>
+            <div className={`text-xs uppercase tracking-wide mb-1 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Accuracy</div>
             <div className="text-2xl font-bold text-blue-500">{startTime ? liveAccuracy : "-"}%</div>
           </div>
         </div>
         
         <div className="flex items-center gap-3">
           <div className="flex flex-col items-center">
-            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Progress</div>
-            <div className="text-sm font-medium text-gray-700 flex items-center">
+            <div className={`text-xs uppercase tracking-wide mb-1 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Progress</div>
+            <div className={`text-sm font-medium flex items-center ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
               <span className="text-purple-600 font-bold">{Math.min(currentWordIndex + 1, sampleWords.length)}</span>
               <span className="mx-1">/</span>
               <span>{sampleWords.length}</span>
@@ -402,7 +591,11 @@ const TypingBox = () => {
           
           <button 
             onClick={() => setShowKeyboard(!showKeyboard)}
-            className={`p-1.5 rounded-lg transition-colors ${showKeyboard ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}
+            className={`p-1.5 rounded-lg transition-colors ${
+              theme === "dark" 
+                ? showKeyboard ? 'bg-purple-900/50 text-purple-300' : 'bg-gray-700 text-gray-300'
+                : showKeyboard ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'
+            }`}
             title={showKeyboard ? "Hide keyboard" : "Show keyboard"}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -412,40 +605,36 @@ const TypingBox = () => {
         </div>
       </div>
 
-      {renderKeyboard()}
+      {showKeyboard && renderKeyboard()}
 
+      {/* Main typing area with direct input */}
       <div 
-        ref={textDisplayRef}
-        className="mb-6 bg-white p-8 rounded-xl shadow-md border border-gray-200 max-h-[250px] overflow-y-auto relative"
+        ref={textBoxRef}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        className={`mb-6 p-6 md:p-10 rounded-xl outline-none ${
+          theme === "dark" 
+            ? "bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-purple-700" 
+            : "bg-white border border-gray-200 shadow-lg focus:ring-2 focus:ring-purple-300"
+        } ${isFocused ? (theme === "dark" ? "ring-2 ring-purple-700" : "ring-2 ring-purple-300") : ""}`}
       >
         {renderText()}
-      </div>
-
-      <div className="relative mb-8">
-        <input
-          ref={inputRef}
-          type="text"
-          value={userInput}
-          onChange={handleInputChange}
-          className={`w-full px-5 py-4 text-lg rounded-xl border shadow-sm focus:outline-none transition-all ${
-            isComplete
-              ? "border-gray-300 bg-gray-50"
-              : "border-purple-300 focus:ring-4 focus:ring-purple-100 focus:border-purple-500"
-          }`}
-          placeholder={isComplete ? "Test completed!" : "Start typing here..."}
-          disabled={isComplete || timeLeft === 0}
-        />
+        
         {!startTime && !isComplete && (
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-purple-100 text-purple-700 px-4 py-2 rounded-lg text-sm font-medium animate-pulse flex items-center">
+          <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-2 rounded-lg text-sm font-medium animate-pulse flex items-center ${
+            theme === "dark" ? "bg-purple-900/50 text-purple-300" : "bg-purple-100 text-purple-700"
+          }`}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Type to start!
+            Click here and start typing!
           </div>
         )}
         
-        <div className="absolute -bottom-6 left-0 text-xs text-gray-500">
-          Press Tab to restart | Press Enter to complete
+        <div className={`mt-4 text-xs ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>
+          Press Tab to restart | Press Enter to complete | Press Backspace to correct
         </div>
       </div>
 
@@ -481,6 +670,7 @@ const TypingBox = () => {
         </button>
       </div>
 
+      {/* Results section */}
       {isComplete && (
         <div className="mt-6 space-y-5">
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 rounded-xl p-6 shadow-sm">
@@ -500,6 +690,19 @@ const TypingBox = () => {
                 </svg>
                 Try Again
               </button>
+            </div>
+            
+            {/* Add skill level indicator */}
+            <div className={`mb-4 flex items-center justify-center py-3 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-white"} shadow-sm`}>
+              <div className="text-center">
+                <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Your Skill Level</div>
+                <div className={`text-2xl font-bold ${getSkillLevelColor()}`}>
+                  {calculateSkillLevel()}
+                </div>
+                <div className={`text-xs mt-1 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+                  Based on WPM ({wpm}) and Accuracy ({calculateAccuracy()}%)
+                </div>
+              </div>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -584,10 +787,20 @@ const TypingBox = () => {
       )}
 
       <style jsx>{`
-        .space-char::before {
-          content: "·";
-          color: #d1d5db;
+        .active-word {
+          position: relative;
+        }
+        
+        .active-word::before {
+          content: '';
           position: absolute;
+          top: -3px;
+          left: -3px;
+          right: -3px;
+          bottom: -3px;
+          border-radius: 0.25rem;
+          background-color: ${theme === "dark" ? "rgba(124, 58, 237, 0.15)" : "rgba(124, 58, 237, 0.08)"};
+          z-index: -1;
         }
         
         [data-tips]:hover::after {
@@ -596,7 +809,7 @@ const TypingBox = () => {
           top: -30px;
           left: 50%;
           transform: translateX(-50%);
-          background: #4c1d95;
+          background: ${theme === "dark" ? "#4c1d95" : "#4c1d95"};
           color: white;
           padding: 2px 6px;
           border-radius: 4px;
