@@ -47,7 +47,7 @@ const Dashboard = () => {
       
       // Send request to update profile image
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/users/update-profile-image`,
+        `${import.meta.env.VITE_API_URL}/api/auth/update-profile-image`,
         formData,
         { 
           withCredentials: true,

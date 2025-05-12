@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import { sendOTP } from "../utils/sendOTP.js";
+import cloudinary from "../config/cloudinary.js";
+import { Readable } from 'stream';
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -140,5 +142,74 @@ export const logout = async (req, res) => {
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const updateProfileImage = async (req, res) => {
+  try {
+    const userId = req.cookies["access-token"] 
+      ? jwt.verify(req.cookies["access-token"], process.env.secret).id 
+      : null;
+    
+    if (!userId) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    // Get the profile image file from Multer middleware
+    if (!req.file) {
+      return res.status(400).json({ message: "Profile image file is required" });
+    }
+
+    // Find the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Upload image to Cloudinary using buffer upload
+    const streamUpload = (buffer) => {
+      return new Promise((resolve, reject) => {
+        const stream = Readable.from(buffer);
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: "smartstrokes/profiles",
+            resource_type: "image",
+            transformation: [
+              { width: 400, height: 400, crop: "fill" },
+              { quality: "auto" }
+            ]
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        stream.pipe(uploadStream);
+      });
+    };
+
+    const result = await streamUpload(req.file.buffer);
+
+    // Update user's profile image with Cloudinary URL
+    user.profileImage = result.secure_url;
+    await user.save();
+
+    // Return updated user info
+    return res.status(200).json({
+      message: "Profile image updated successfully",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        profileImage: user.profileImage,
+        isVerified: user.isVerified
+      }
+    });
+  } catch (error) {
+    console.error("Error updating profile image:", error);
+    return res.status(500).json({ 
+      message: "Error updating profile image", 
+      error: error.message 
+    });
   }
 };
