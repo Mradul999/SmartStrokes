@@ -1,9 +1,5 @@
 @import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* Custom styles for dark theme transitions */
 * {
   transition-property: background-color, border-color, color, fill, stroke;
@@ -37,7 +33,12 @@ body.dark-theme::-webkit-scrollbar-thumb:hover {
 }
 
 /* Custom typography for dark theme */
-.dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme h4, .dark-theme h5, .dark-theme h6 {
+.dark-theme h1,
+.dark-theme h2,
+.dark-theme h3,
+.dark-theme h4,
+.dark-theme h5,
+.dark-theme h6 {
   color: #f3f4f6; /* gray-100 */
 }
 
@@ -52,18 +53,23 @@ body.dark-theme::-webkit-scrollbar-thumb:hover {
 }
 
 /* Dark theme form input styles */
-.dark-theme input, .dark-theme textarea, .dark-theme select {
+.dark-theme input,
+.dark-theme textarea,
+.dark-theme select {
   background-color: #1f2937; /* gray-800 */
   border-color: #374151; /* gray-700 */
   color: #f3f4f6; /* gray-100 */
 }
 
-.dark-theme input:focus, .dark-theme textarea:focus, .dark-theme select:focus {
+.dark-theme input:focus,
+.dark-theme textarea:focus,
+.dark-theme select:focus {
   border-color: #a78bfa; /* purple-400 */
   box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2); /* purple-400 with opacity */
 }
 
-.dark-theme input::placeholder, .dark-theme textarea::placeholder {
+.dark-theme input::placeholder,
+.dark-theme textarea::placeholder {
   color: #6b7280; /* gray-500 */
 }
 
@@ -97,7 +103,9 @@ body.dark-theme::-webkit-scrollbar-thumb:hover {
   border-color: #374151; /* gray-700 */
 }
 
-.dark-theme .shadow-md, .dark-theme .shadow-lg, .dark-theme .shadow-xl {
+.dark-theme .shadow-md,
+.dark-theme .shadow-lg,
+.dark-theme .shadow-xl {
   --tw-shadow-color: rgba(0, 0, 0, 0.5);
 }
 
@@ -187,7 +195,7 @@ body.dark-theme::-webkit-scrollbar-thumb:hover {
 }
 
 /* Card styles in dark mode */
-.dark-theme .card, 
+.dark-theme .card,
 .dark-theme div[class*="rounded"][class*="shadow"] {
   background-color: #1f2937; /* gray-800 */
   border-color: #374151; /* gray-700 */
