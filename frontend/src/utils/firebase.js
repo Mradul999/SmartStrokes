@@ -1,12 +1,16 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { DecimalsArrowLeftIcon } from "lucide-react";
+
+// import dotenv from "dotenv";
+// dotenv.config();
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
+
 const firebaseConfig = {
-  apiKey: "AIzaSyD91D3lEku12x0kwqJDnfLzCy8eUflaaNo",
+  apiKey: import.meta.env.VITE_FIREBASE_KEY,
   authDomain: "smart-strokes.firebaseapp.com",
   projectId: "smart-strokes",
   storageBucket: "smart-strokes.firebasestorage.app",
