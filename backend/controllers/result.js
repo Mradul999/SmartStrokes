@@ -28,9 +28,9 @@ export const saveResult = async (req, res) => {
       correctChars,
       incorrectChars,
     } = req.body;
-    console.log("wpm", wpm);
-    console.log("sampleText", sampleText);
-    console.log("wrongKeyPresses", wrongKeyPresses);
+    // console.log("wpm", wpm);
+    // console.log("sampleText", sampleText);
+    // console.log("wrongKeyPresses", wrongKeyPresses);
 
     // Ensure WPM is a number
     const numericWpm = Number(wpm) || 0;
