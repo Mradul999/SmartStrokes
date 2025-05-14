@@ -18,9 +18,7 @@ const app = express();
 app.use(
   cors({
     origin: ["http://localhost:5173", "https://smart-strokes.vercel.app"],
-    methods: ["GET", "POST"],
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
