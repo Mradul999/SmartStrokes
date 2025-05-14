@@ -130,6 +130,10 @@ export const login = async (req, res) => {
         secure: process.env.NODE_ENV === "production", // true in production
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // important for cross-origin requests
         maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+        domain:
+          process.env.NODE_ENV === "production"
+            ? "https://smart-strokes.vercel.app"
+            : undefined,
         path: "/", // make cookie available for all paths
       })
       .status(200)
