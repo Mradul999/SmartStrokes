@@ -5,6 +5,7 @@ import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import authStore from "../store/store.js";
 import { ThemeContext } from "../context/ThemeContext";
+import SignInWithGoogle from "../components/SignInWithGoogle.jsx";
 
 const Signup = () => {
   const { theme } = useContext(ThemeContext);
@@ -14,7 +15,7 @@ const Signup = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    profileImage: ""
+    profileImage: "",
   });
   const [error, setError] = useState("");
   const [avatarSeed, setAvatarSeed] = useState("");
@@ -35,15 +36,22 @@ const Signup = () => {
     // Generate a random seed for the avatar
     const seed = Math.random().toString(36).substring(2, 10);
     setAvatarSeed(seed);
-    
+
     // Randomly select one of several DiceBear avatar styles (v7.x API)
-    const styles = ["adventurer", "avataaars-neutral", "bottts", "pixel-art", "identicon", "shapes"];
+    const styles = [
+      "adventurer",
+      "avataaars-neutral",
+      "bottts",
+      "pixel-art",
+      "identicon",
+      "shapes",
+    ];
     const randomStyle = styles[Math.floor(Math.random() * styles.length)];
     setAvatarStyle(randomStyle);
-    
+
     // Create the modern DiceBear URL with v7.x API
     const avatarUrl = `https://api.dicebear.com/7.x/${randomStyle}/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
-    setFormData(prev => ({...prev, profileImage: avatarUrl}));
+    setFormData((prev) => ({ ...prev, profileImage: avatarUrl }));
   };
 
   const handleChange = (e) =>
@@ -67,7 +75,7 @@ const Signup = () => {
       name: formData.name,
       email: formData.email,
       password: formData.password,
-      profilePic: formData.profileImage
+      profilePic: formData.profileImage,
     };
 
     try {
@@ -86,47 +94,56 @@ const Signup = () => {
         // Store email and profile image in session storage for OTP verification
         sessionStorage.setItem("email", formData.email);
         sessionStorage.setItem("pendingProfileImage", formData.profileImage);
-        
+
         navigate("/otp-verification");
       }
     } catch (error) {
       setLoading(false);
       console.log("Registration error:", error);
-      setError(error.response?.data?.message || "An error occurred during registration");
+      setError(
+        error.response?.data?.message || "An error occurred during registration"
+      );
       return;
     }
   };
 
   return (
-    <div className={`min-h-screen flex items-center justify-center ${
-      theme === "dark" 
-        ? "bg-gradient-to-tr from-gray-900 to-purple-900"
-        : "bg-gradient-to-tr from-purple-100 to-blue-100"
-    } px-4 pt-20 pb-10`}>
+    <div
+      className={`min-h-screen flex items-center justify-center ${
+        theme === "dark"
+          ? "bg-gradient-to-tr from-gray-900 to-purple-900"
+          : "bg-gradient-to-tr from-purple-100 to-blue-100"
+      } px-4 pt-20 pb-10`}
+    >
       <form
         onSubmit={handleSubmit}
         className={`p-8 rounded-xl shadow-xl w-full max-w-md ${
-          theme === "dark" 
-            ? "bg-gray-800 border border-gray-700" 
-            : "bg-white"
+          theme === "dark" ? "bg-gray-800 border border-gray-700" : "bg-white"
         }`}
       >
-        <h2 className={`text-2xl font-bold text-center mb-6 ${
-          theme === "dark" ? "text-purple-300" : "text-purple-600"
-        }`}>
+        <h2
+          className={`text-2xl font-bold text-center mb-6 ${
+            theme === "dark" ? "text-purple-300" : "text-purple-600"
+          }`}
+        >
           Create Account
         </h2>
 
         {/* Avatar preview with fixed size and border */}
         <div className="mb-6 flex flex-col items-center">
-          <div className={`w-28 h-28 rounded-full overflow-hidden mb-3 ${
-            theme === "dark" 
-              ? "border-4 border-gray-700" 
-              : "border-4 border-purple-200"
-          }`}>
-            <img 
-              src={formData.profileImage || `https://api.dicebear.com/7.x/adventurer/svg?seed=default`}
-              alt="Avatar" 
+          <div
+            className={`w-28 h-28 rounded-full overflow-hidden mb-3 ${
+              theme === "dark"
+                ? "border-4 border-gray-700"
+                : "border-4 border-purple-200"
+            }`}
+          >
+            <img
+              src={
+                formData.profileImage ||
+                `https://api.dicebear.com/7.x/adventurer/svg?seed=default`
+              }
+              alt="Avatar"
               className="w-full h-full object-cover bg-white"
             />
           </div>
@@ -134,8 +151,8 @@ const Signup = () => {
             type="button"
             onClick={generateRandomAvatar}
             className={`px-3 py-1.5 rounded-lg shadow-sm text-sm font-medium transition-colors ${
-              theme === "dark" 
-                ? "bg-purple-700 text-white hover:bg-purple-600" 
+              theme === "dark"
+                ? "bg-purple-700 text-white hover:bg-purple-600"
                 : "bg-purple-100 text-purple-700 hover:bg-purple-200"
             }`}
           >
@@ -144,9 +161,13 @@ const Signup = () => {
         </div>
 
         <div className="mb-4">
-          <label className={`block mb-2 font-medium ${
-            theme === "dark" ? "text-gray-200" : "text-gray-700"
-          }`}>Full Name</label>
+          <label
+            className={`block mb-2 font-medium ${
+              theme === "dark" ? "text-gray-200" : "text-gray-700"
+            }`}
+          >
+            Full Name
+          </label>
           <input
             name="name"
             placeholder="Enter your full name"
@@ -154,17 +175,21 @@ const Signup = () => {
             onChange={handleChange}
             required
             className={`w-full px-4 py-3 rounded-lg focus:ring-2 ${
-              theme === "dark" 
-                ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 placeholder-gray-400" 
+              theme === "dark"
+                ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 placeholder-gray-400"
                 : "border focus:ring-purple-400 placeholder-gray-400"
             }`}
           />
         </div>
 
         <div className="mb-4">
-          <label className={`block mb-2 font-medium ${
-            theme === "dark" ? "text-gray-200" : "text-gray-700"
-          }`}>Email</label>
+          <label
+            className={`block mb-2 font-medium ${
+              theme === "dark" ? "text-gray-200" : "text-gray-700"
+            }`}
+          >
+            Email
+          </label>
           <input
             name="email"
             type="email"
@@ -173,17 +198,21 @@ const Signup = () => {
             onChange={handleChange}
             required
             className={`w-full px-4 py-3 rounded-lg focus:ring-2 ${
-              theme === "dark" 
-                ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 placeholder-gray-400" 
+              theme === "dark"
+                ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 placeholder-gray-400"
                 : "border focus:ring-purple-400 placeholder-gray-400"
             }`}
           />
         </div>
 
         <div className="mb-4 relative">
-          <label className={`block mb-2 font-medium ${
-            theme === "dark" ? "text-gray-200" : "text-gray-700"
-          }`}>Password</label>
+          <label
+            className={`block mb-2 font-medium ${
+              theme === "dark" ? "text-gray-200" : "text-gray-700"
+            }`}
+          >
+            Password
+          </label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -193,8 +222,8 @@ const Signup = () => {
               onChange={handleChange}
               required
               className={`w-full px-4 py-3 rounded-lg focus:ring-2 ${
-                theme === "dark" 
-                  ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 placeholder-gray-400" 
+                theme === "dark"
+                  ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 placeholder-gray-400"
                   : "border focus:ring-purple-400 placeholder-gray-400"
               }`}
             />
@@ -210,9 +239,13 @@ const Signup = () => {
         </div>
 
         <div className="mb-6 relative">
-          <label className={`block mb-2 font-medium ${
-            theme === "dark" ? "text-gray-200" : "text-gray-700"
-          }`}>Confirm Password</label>
+          <label
+            className={`block mb-2 font-medium ${
+              theme === "dark" ? "text-gray-200" : "text-gray-700"
+            }`}
+          >
+            Confirm Password
+          </label>
           <div className="relative">
             <input
               type={showConfirm ? "text" : "password"}
@@ -222,8 +255,8 @@ const Signup = () => {
               onChange={handleChange}
               required
               className={`w-full px-4 py-3 rounded-lg focus:ring-2 ${
-                theme === "dark" 
-                  ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 placeholder-gray-400" 
+                theme === "dark"
+                  ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 placeholder-gray-400"
                   : "border focus:ring-purple-400 placeholder-gray-400"
               }`}
             />
@@ -237,13 +270,15 @@ const Signup = () => {
             </span>
           </div>
         </div>
-        
+
         {error && (
-          <div className={`mb-6 p-4 rounded-lg ${
-            theme === "dark" 
-              ? "bg-red-900/60 border border-red-800 text-red-200" 
-              : "bg-red-100 border border-red-400 text-red-600"
-          }`}>
+          <div
+            className={`mb-6 p-4 rounded-lg ${
+              theme === "dark"
+                ? "bg-red-900/60 border border-red-800 text-red-200"
+                : "bg-red-100 border border-red-400 text-red-600"
+            }`}
+          >
             {error}
           </div>
         )}
@@ -259,15 +294,24 @@ const Signup = () => {
         >
           {loading ? <ClipLoader size={24} color="#fff" /> : "Sign Up"}
         </button>
-        
-        <div className={`mt-6 text-center text-sm ${
-          theme === "dark" ? "text-gray-400" : "text-gray-600"
-        }`}>
+
+        <div className="flex gap-2 mt-2 flex-col ">
+          <span className="flex justify-center  ">OR</span>
+          <SignInWithGoogle />
+        </div>
+
+        <div
+          className={`mt-6 text-center text-sm ${
+            theme === "dark" ? "text-gray-400" : "text-gray-600"
+          }`}
+        >
           Already have an account?{" "}
-          <a 
-            href="/signin" 
+          <a
+            href="/signin"
             className={`font-medium ${
-              theme === "dark" ? "text-purple-400 hover:text-purple-300" : "text-purple-600 hover:text-purple-700"
+              theme === "dark"
+                ? "text-purple-400 hover:text-purple-300"
+                : "text-purple-600 hover:text-purple-700"
             }`}
           >
             Sign in

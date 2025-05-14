@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import { sendOTP } from "../utils/sendOTP.js";
 import cloudinary from "../config/cloudinary.js";
-import { Readable } from 'stream';
+import { Readable } from "stream";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -28,7 +28,9 @@ export const SignUp = async (req, res) => {
       otp,
       isVerified: false,
       otpExpiresAt: otpExpiry,
-      profileImage: profilePic || "https://thumbs.dreamstime.com/b/modern-random-cartoon-sticker-detailed-illustrated-isolated-white-background-modern-random-cartoon-sticker-detailed-illustrated-353166857.jpg",
+      profileImage:
+        profilePic ||
+        "https://thumbs.dreamstime.com/b/modern-random-cartoon-sticker-detailed-illustrated-isolated-white-background-modern-random-cartoon-sticker-detailed-illustrated-353166857.jpg",
     });
     await newUser.save();
     await sendOTP(email, otp);
@@ -60,14 +62,14 @@ export const verifyOTP = async (req, res) => {
 
     existingUser.isVerified = true;
     existingUser.otp = undefined;
-    
+
     // Update profile image if provided during verification
     if (profileImage) {
       existingUser.profileImage = profileImage;
     }
 
     await existingUser.save();
-    
+
     // Return the user data for auto-login
     const token = jwt.sign({ id: existingUser._id }, process.env.secret, {
       expiresIn: "1d",
@@ -79,15 +81,15 @@ export const verifyOTP = async (req, res) => {
         maxAge: 24 * 60 * 60 * 1000,
       })
       .status(200)
-      .json({ 
-        message: "Email Verified. You are now logged in.", 
+      .json({
+        message: "Email Verified. You are now logged in.",
         user: {
           _id: existingUser._id,
           name: existingUser.name,
           email: existingUser.email,
           profileImage: existingUser.profileImage,
-          isVerified: existingUser.isVerified
-        }
+          isVerified: existingUser.isVerified,
+        },
       });
   } catch (error) {
     console.log(error);
@@ -147,17 +149,19 @@ export const logout = async (req, res) => {
 
 export const updateProfileImage = async (req, res) => {
   try {
-    const userId = req.cookies["access-token"] 
-      ? jwt.verify(req.cookies["access-token"], process.env.secret).id 
+    const userId = req.cookies["access-token"]
+      ? jwt.verify(req.cookies["access-token"], process.env.secret).id
       : null;
-    
+
     if (!userId) {
       return res.status(401).json({ message: "Not authenticated" });
     }
 
     // Get the profile image file from Multer middleware
     if (!req.file) {
-      return res.status(400).json({ message: "Profile image file is required" });
+      return res
+        .status(400)
+        .json({ message: "Profile image file is required" });
     }
 
     // Find the user
@@ -176,8 +180,8 @@ export const updateProfileImage = async (req, res) => {
             resource_type: "image",
             transformation: [
               { width: 400, height: 400, crop: "fill" },
-              { quality: "auto" }
-            ]
+              { quality: "auto" },
+            ],
           },
           (error, result) => {
             if (error) reject(error);
@@ -202,14 +206,61 @@ export const updateProfileImage = async (req, res) => {
         name: user.name,
         email: user.email,
         profileImage: user.profileImage,
-        isVerified: user.isVerified
-      }
+        isVerified: user.isVerified,
+      },
     });
   } catch (error) {
     console.error("Error updating profile image:", error);
-    return res.status(500).json({ 
-      message: "Error updating profile image", 
-      error: error.message 
+    return res.status(500).json({
+      message: "Error updating profile image",
+      error: error.message,
     });
   }
+};
+
+export const continueWithGoogle = async (req, res) => {
+  try {
+    const { displayName, email, photoURL } = req.body;
+    console.log(email);
+
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      const token = jwt.sign({ id: existingUser._id }, process.env.secret, {
+        expiresIn: "1d",
+      });
+      res
+        .cookie("access-token", token, {
+          httpOnly: true,
+
+          maxAge: 24 * 60 * 60 * 1000,
+        })
+        .status(200)
+        .json({ message: "User logged in successfully", user: existingUser });
+    }
+
+    const randomPassword = Math.random().toString(36).slice(-8);
+
+    const newUser = new User({
+      name: displayName,
+      email,
+      profileImage: photoURL,
+      isVerified: true,
+      password: randomPassword,
+    });
+
+    await newUser.save();
+
+    const token = jwt.sign({ id: newUser._id }, process.env.secret, {
+      expiresIn: "1d",
+    });
+
+    res
+      .cookie("access-token", token, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      })
+      .status(201)
+      .json({ message: "User registered Successfully", user: newUser });
+  } catch (error) {}
 };

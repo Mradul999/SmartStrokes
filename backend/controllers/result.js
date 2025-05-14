@@ -6,7 +6,7 @@ dotenv.config();
 export const saveResult = async (req, res) => {
   try {
     const token = req.cookies["access-token"];
-    // console.log("token", token);
+    console.log("token", token);
 
     if (!token) {
       return res
@@ -18,7 +18,16 @@ export const saveResult = async (req, res) => {
     const userId = decoded.id;
     // console.log("userid ", userId);
 
-    const { wpm, sampleText, wrongKeyPresses, weakKeyStats, accuracy, userInput, correctChars, incorrectChars } = req.body;
+    const {
+      wpm,
+      sampleText,
+      wrongKeyPresses,
+      weakKeyStats,
+      accuracy,
+      userInput,
+      correctChars,
+      incorrectChars,
+    } = req.body;
     console.log("wpm", wpm);
     console.log("sampleText", sampleText);
     console.log("wrongKeyPresses", wrongKeyPresses);
@@ -69,32 +78,43 @@ export const getUserPerformance = async (req, res) => {
     const userId = decoded.id;
 
     // Get all user sessions
-    const allSessions = await UserTypingSession.find({ userId })
-      .sort({ createdAt: -1 });
-    
+    const allSessions = await UserTypingSession.find({ userId }).sort({
+      createdAt: -1,
+    });
+
     // Filter out sessions with zero WPM if there are alternatives
-    const validSessions = allSessions.filter(session => Number(session.wpm) > 0);
-    
+    const validSessions = allSessions.filter(
+      (session) => Number(session.wpm) > 0
+    );
+
     // If all sessions have zero WPM, keep them all
-    const sessions = validSessions.length > 0 ? validSessions.slice(0, 7) : allSessions.slice(0, 7);
+    const sessions =
+      validSessions.length > 0
+        ? validSessions.slice(0, 7)
+        : allSessions.slice(0, 7);
 
     // Calculate average performance only from non-zero values
     const wpmValues = sessions
-      .map(session => Number(session.wpm))
-      .filter(wpm => wpm > 0);
-      
+      .map((session) => Number(session.wpm))
+      .filter((wpm) => wpm > 0);
+
     const accuracyValues = sessions
-      .map(session => Number(session.accuracy))
-      .filter(accuracy => accuracy > 0);
-    
+      .map((session) => Number(session.accuracy))
+      .filter((accuracy) => accuracy > 0);
+
     const averageWpm =
-      wpmValues.length > 0 
-        ? Math.round(wpmValues.reduce((sum, val) => sum + val, 0) / wpmValues.length) 
+      wpmValues.length > 0
+        ? Math.round(
+            wpmValues.reduce((sum, val) => sum + val, 0) / wpmValues.length
+          )
         : 0;
-        
+
     const averageAccuracy =
-      accuracyValues.length > 0 
-        ? Math.round(accuracyValues.reduce((sum, val) => sum + val, 0) / accuracyValues.length) 
+      accuracyValues.length > 0
+        ? Math.round(
+            accuracyValues.reduce((sum, val) => sum + val, 0) /
+              accuracyValues.length
+          )
         : 0;
 
     // Get most common weak keys with their counts
@@ -109,7 +129,10 @@ export const getUserPerformance = async (req, res) => {
       }
 
       // Process the detailed statistics if available
-      if (session.weakKeyStats && Object.keys(session.weakKeyStats).length > 0) {
+      if (
+        session.weakKeyStats &&
+        Object.keys(session.weakKeyStats).length > 0
+      ) {
         const statsMap = session.weakKeyStats;
         // Convert Map to object if needed
         const stats =
@@ -129,14 +152,14 @@ export const getUserPerformance = async (req, res) => {
     const formattedSessions = sessions.map((session) => {
       const wpm = Number(session.wpm) || 0;
       const accuracy = Number(session.accuracy) || 0;
-      
+
       // If WPM is zero but text was typed, calculate a rough estimate
       let calculatedWpm = wpm;
       if (wpm === 0 && session.textTyped && session.textTyped.length > 0) {
         // Standard typing test measurement: 5 characters = 1 word
         calculatedWpm = Math.round(session.textTyped.length / 5);
       }
-      
+
       return {
         ...session.toObject(),
         wpm: calculatedWpm,
@@ -154,11 +177,9 @@ export const getUserPerformance = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .json({
-        message: "error in fetching user performance",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "error in fetching user performance",
+      error: error.message,
+    });
   }
 };
