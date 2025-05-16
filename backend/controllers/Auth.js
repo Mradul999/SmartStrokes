@@ -123,14 +123,13 @@ export const login = async (req, res) => {
       expiresIn: "1d",
     });
 
-    // Example of properly setting a cookie
     res
       .cookie("access-token", token, {
         httpOnly: true,
-        
+        secure: process.env.NODE_ENV === "production", // true in production
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // important for cross-origin requests
         maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
-
-       // make cookie available for all paths
+        path: "/", // make cookie available for all paths
       })
       .status(200)
       .json({ message: "User logged in successfully", existingUser });

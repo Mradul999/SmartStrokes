@@ -67,6 +67,7 @@ export const saveResult = async (req, res) => {
 export const getUserPerformance = async (req, res) => {
   try {
     const token = req.cookies["access-token"];
+    console.log("token", token);
 
     if (!token) {
       return res

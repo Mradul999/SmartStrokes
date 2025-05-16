@@ -38,7 +38,7 @@ const Signin = () => {
       if (response.status === 200) {
         setError("");
         setCurrentUser(response.data.existingUser);
-        saveResult(typingResult);
+        // saveResult(typingResult);
         navigate("/");
       }
     } catch (error) {
@@ -150,7 +150,7 @@ const Signin = () => {
         >
           {loading ? <ClipLoader size={24} color="#fff" /> : "Sign In"}
         </button>
-        <div  className="flex gap-2 mt-2 flex-col ">
+        <div className="flex gap-2 mt-2 flex-col ">
           <span className="flex justify-center  ">OR</span>
           <SignInWithGoogle />
         </div>
