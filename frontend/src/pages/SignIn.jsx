@@ -37,8 +37,8 @@ const Signin = () => {
 
       if (response.status === 200) {
         setError("");
+
         setCurrentUser(response.data.existingUser);
-        // saveResult(typingResult);
         navigate("/");
       }
     } catch (error) {
