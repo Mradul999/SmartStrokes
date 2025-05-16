@@ -5,10 +5,11 @@ import sampleParagraphs from "../data.json";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import auhtStore from "../store/store.js";
-import { NavLink } from "react-router-dom";
+import { Navigate, NavLink } from "react-router-dom";
 import { saveResult } from "../utils/saveResult.js";
 import TypingresultStore from "../store/TypingResultStore.js";
 import { ThemeContext } from "../context/ThemeContext";
+import { useNavigate } from "react-router-dom";
 
 const TypingBox = () => {
   const [userInput, setUserInput] = useState("");
@@ -31,6 +32,7 @@ const TypingBox = () => {
   const [visibleLineStart, setVisibleLineStart] = useState(0);
   const [linesPerView, setLinesPerView] = useState(3);
 
+  const navigate = useNavigate();
   const textBoxRef = useRef(null);
   const timerRef = useRef(null);
   const livePerfRef = useRef(null);
@@ -801,37 +803,50 @@ const TypingBox = () => {
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
             />
           </svg>
-          New Text
+          {timeLeft == 60 && "New Text"}
         </button>
 
         <button
-          onClick={setAiGeneratedtext}
+          onClick={() => {
+            if (currentUser) {
+              setAiGeneratedtext();
+            } else {
+              navigate("/signin");
+            }
+          }}
           className={`flex items-center px-6 py-3 text-white rounded-xl shadow-md transform transition-all hover:-translate-y-0.5 ${
             theme === "dark"
               ? "bg-gradient-to-r from-indigo-700 to-blue-800 hover:from-indigo-800 hover:to-blue-900"
               : "bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700"
           } ${loading && "opacity-50 pointer-events-none"}`}
         >
-          {loading ? (
-            <ClipLoader size={20} color="#fff" />
+          {" "}
+          {currentUser ? (
+            <div className="flex items-center">
+              {loading ? (
+                <ClipLoader size={20} color="#fff" />
+              ) : (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
+                  </svg>
+                  AI Practice
+                </>
+              )}
+            </div>
           ) : (
-            <>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
-              </svg>
-              AI Practice
-            </>
+            <span>Login to practice with AI</span>
           )}
         </button>
       </div>
