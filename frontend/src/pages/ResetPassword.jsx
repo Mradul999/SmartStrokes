@@ -2,22 +2,21 @@ import React, { useState, useContext } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { ClipLoader } from "react-spinners";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import authStore from "../store/store.js";
-import TypingresultStore from "../store/TypingResultStore.js";
-import { saveResult } from "../utils/saveResult.js";
+import { useNavigate, useParams } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
-import SignInWithGoogle from "../components/SignInWithGoogle.jsx";
 
-const Signin = () => {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+const ResetPassword = () => {
+  const { theme } = useContext(ThemeContext);
+  const { token } = useParams();
+  const [formData, setFormData] = useState({
+    password: "",
+    confirmPassword: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { theme } = useContext(ThemeContext);
-
-  const setCurrentUser = authStore((state) => state?.setCurrentUser);
-  const typingResult = TypingresultStore((state) => state.typingResult);
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) =>
@@ -27,23 +26,31 @@ const Signin = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/login`,
-        formData,
+        `${import.meta.env.VITE_API_URL}/api/auth/reset-password/${token}`,
+        { password: formData.password },
         { withCredentials: true }
       );
 
       if (response.status === 200) {
-        setError("");
-
-        setCurrentUser(response.data.existingUser);
-        navigate("/");
+        setSuccess("Password reset successful!");
+        setTimeout(() => {
+          navigate("/signin");
+        }, 3000);
       }
     } catch (error) {
-      // console.log(error);
-      setError(error.response.data.message);
+      setError(
+        error.response?.data?.message || "Failed to reset password"
+      );
     } finally {
       setLoading(false);
     }
@@ -68,31 +75,8 @@ const Signin = () => {
             theme === "dark" ? "text-purple-300" : "text-purple-600"
           }`}
         >
-          Welcome Back
+          Reset Password
         </h2>
-
-        <div className="mb-4">
-          <label
-            className={`block mb-2 font-medium ${
-              theme === "dark" ? "text-gray-200" : "text-gray-700"
-            }`}
-          >
-            Email
-          </label>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            name="email"
-            required
-            value={formData.email}
-            onChange={handleChange}
-            className={`w-full px-4 py-3 rounded-lg focus:ring-2 ${
-              theme === "dark"
-                ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 placeholder-gray-400"
-                : "border focus:ring-purple-400 placeholder-gray-400"
-            }`}
-          />
-        </div>
 
         <div className="mb-6 relative">
           <label
@@ -100,13 +84,13 @@ const Signin = () => {
               theme === "dark" ? "text-gray-200" : "text-gray-700"
             }`}
           >
-            Password
+            New Password
           </label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               name="password"
-              placeholder="Enter your password"
+              placeholder="Enter new password"
               required
               value={formData.password}
               onChange={handleChange}
@@ -127,6 +111,39 @@ const Signin = () => {
           </div>
         </div>
 
+        <div className="mb-6 relative">
+          <label
+            className={`block mb-2 font-medium ${
+              theme === "dark" ? "text-gray-200" : "text-gray-700"
+            }`}
+          >
+            Confirm New Password
+          </label>
+          <div className="relative">
+            <input
+              type={showConfirm ? "text" : "password"}
+              name="confirmPassword"
+              placeholder="Confirm new password"
+              required
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 rounded-lg focus:ring-2 ${
+                theme === "dark"
+                  ? "bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 placeholder-gray-400"
+                  : "border focus:ring-purple-400 placeholder-gray-400"
+              }`}
+            />
+            <span
+              onClick={() => setShowConfirm(!showConfirm)}
+              className={`absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer ${
+                theme === "dark" ? "text-gray-400" : "text-gray-500"
+              }`}
+            >
+              {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
+            </span>
+          </div>
+        </div>
+
         {error && (
           <div
             className={`mb-6 p-4 rounded-lg ${
@@ -139,6 +156,18 @@ const Signin = () => {
           </div>
         )}
 
+        {success && (
+          <div
+            className={`mb-6 p-4 rounded-lg ${
+              theme === "dark"
+                ? "bg-green-900/60 border border-green-800 text-green-200"
+                : "bg-green-100 border border-green-400 text-green-600"
+            }`}
+          >
+            {success}
+          </div>
+        )}
+
         <button
           type="submit"
           className={`w-full py-3 rounded-lg font-medium transition-colors flex justify-center items-center text-white ${
@@ -148,50 +177,11 @@ const Signin = () => {
           }`}
           disabled={loading}
         >
-          {loading ? <ClipLoader size={24} color="#fff" /> : "Sign In"}
+          {loading ? <ClipLoader size={24} color="#fff" /> : "Reset Password"}
         </button>
-        <div className="flex gap-2 mt-2 flex-col ">
-          <span className="flex justify-center  ">OR</span>
-          <SignInWithGoogle />
-        </div>
-
-        <div
-          className={`mt-6 text-center text-sm ${
-            theme === "dark" ? "text-gray-400" : "text-gray-600"
-          }`}
-        >
-          Don't have an account?{" "}
-          <a
-            href="/signup"
-            className={`font-medium ${
-              theme === "dark"
-                ? "text-purple-400 hover:text-purple-300"
-                : "text-purple-600 hover:text-purple-700"
-            }`}
-          >
-            Sign up
-          </a>
-        </div>
-        <div
-          className={`mt-6 text-center text-sm ${
-            theme === "dark" ? "text-gray-400" : "text-gray-600"
-          }`}
-        >
-          Forgot your password?{" "}
-          <a
-            href="/forgot-password"
-            className={`font-medium ${
-              theme === "dark"
-                ? "text-purple-400 hover:text-purple-300"
-                : "text-purple-600 hover:text-purple-700"
-            }`}
-          >
-            Reset
-          </a>
-        </div>
       </form>
     </div>
   );
 };
 
-export default Signin;
+export default ResetPassword;

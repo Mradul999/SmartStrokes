@@ -6,6 +6,7 @@ import {
   verifyOTP,
   updateProfileImage,
   continueWithGoogle,
+  forgotPassword,
 } from "../controllers/Auth.js";
 import upload from "../middlewares/multerUpload.js";
 
@@ -20,5 +21,6 @@ router.post(
   updateProfileImage
 );
 router.post("/continuewithgoogle", continueWithGoogle);
+router.post("/forgot-password", forgotPassword);
 
 export default router;

@@ -4,6 +4,7 @@ import User from "../models/User.js";
 import { sendOTP } from "../utils/sendOTP.js";
 import cloudinary from "../config/cloudinary.js";
 import { Readable } from "stream";
+import transporter from "../utils/nodemailertransporter.js";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -147,6 +148,51 @@ export const logout = async (req, res) => {
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Generate reset token
+    const resetToken = jwt.sign({ id: user._id }, process.env.secret, {
+      expiresIn: "15m",
+    });
+
+    // Create reset password link
+    // console.log("frontendurl =>", process.env.FRONTEND_URL);
+    const resetLink = `https://smart-strokes.vercel.app/reset-password/${resetToken}`;
+
+    // Send reset password email
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: "Password Reset Request",
+      html: `
+        <h2>Password Reset Request</h2>
+        <p>Click the link below to reset your password. This link will expire in 15 minutes.</p>
+        <a href="${resetLink}">Reset Password</a>
+        <p>If you didn't request this, please ignore this email.</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({
+      message: "Password reset link has been sent to your email",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Error in sending password reset email",
+      error: error.message,
+    });
   }
 };
 
