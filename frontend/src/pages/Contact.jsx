@@ -28,7 +28,7 @@ const Contact = () => {
     const checkServerStatus = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/test`);
-        console.log("Server status check:", response.data);
+        // console.log("Server status check:", response.data);
         setServerStatus({
           checked: true,
           online: true,
@@ -100,7 +100,7 @@ const Contact = () => {
     });
     
     try {
-      console.log("Submitting form data:", formData);
+      // console.log("Submitting form data:", formData);
       
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/contact/submit`,
@@ -108,7 +108,7 @@ const Contact = () => {
         { withCredentials: true }
       );
       
-      console.log("Form submission response:", response.data);
+      // console.log("Form submission response:", response.data);
       
       if (response.data.success) {
         setFormStatus({

@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 const TypingBox = () => {
   const [userInput, setUserInput] = useState("");
   const [startTime, setStartTime] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(60);
+  const [timeLeft, setTimeLeft] = useState(10);
   const [wpm, setWpm] = useState(0);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
@@ -52,7 +52,7 @@ const TypingBox = () => {
   const reset = () => {
     setUserInput("");
     setStartTime(null);
-    setTimeLeft(60);
+    setTimeLeft(10);
     setWpm(0);
     setLiveWpm(0);
     setLiveAccuracy(100);
@@ -178,7 +178,7 @@ const TypingBox = () => {
       setTypingresult(result);
 
       if (currentUser) {
-        console.log("Saving result:", result);
+        // console.log("Saving result:", result);
         saveResult(result);
       }
     }
@@ -653,13 +653,13 @@ const TypingBox = () => {
             </div>
           </div>
 
-          <div
+          {/* <div
             className={`h-12 w-0.5 ${
               theme === "dark" ? "bg-gray-700" : "bg-gray-200"
             }`}
-          ></div>
+          ></div> */}
 
-          <div className="flex flex-col items-center">
+          {/* <div className="flex flex-col items-center">
             <div
               className={`text-xs uppercase tracking-wide mb-1 ${
                 theme === "dark" ? "text-gray-400" : "text-gray-500"
@@ -670,15 +670,15 @@ const TypingBox = () => {
             <div className="text-2xl font-bold text-purple-600">
               {startTime ? liveWpm : "-"}
             </div>
-          </div>
+          </div> */}
 
-          <div
+          {/* <div
             className={`h-12 w-0.5 ${
               theme === "dark" ? "bg-gray-700" : "bg-gray-200"
             }`}
-          ></div>
+          ></div> */}
 
-          <div className="flex flex-col items-center">
+          {/* <div className="flex flex-col items-center">
             <div
               className={`text-xs uppercase tracking-wide mb-1 ${
                 theme === "dark" ? "text-gray-400" : "text-gray-500"
@@ -689,7 +689,7 @@ const TypingBox = () => {
             <div className="text-2xl font-bold text-blue-500">
               {startTime ? liveAccuracy : "-"}%
             </div>
-          </div>
+          </div> */}
         </div>
 
         <div className="flex items-center gap-3">
@@ -803,52 +803,53 @@ const TypingBox = () => {
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
             />
           </svg>
-          {timeLeft == 60 && "New Text"}
+          {(timeLeft == 10 || isComplete ) && "New Text"}
         </button>
-
-        <button
-          onClick={() => {
-            if (currentUser) {
-              setAiGeneratedtext();
-            } else {
-              navigate("/signin");
-            }
-          }}
-          className={`flex items-center px-6 py-3 text-white rounded-xl shadow-md transform transition-all hover:-translate-y-0.5 ${
-            theme === "dark"
-              ? "bg-gradient-to-r from-indigo-700 to-blue-800 hover:from-indigo-800 hover:to-blue-900"
-              : "bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700"
-          } ${loading && "opacity-50 pointer-events-none"}`}
-        >
-          {" "}
-          {currentUser ? (
-            <div className="flex items-center">
-              {loading ? (
-                <ClipLoader size={20} color="#fff" />
-              ) : (
-                <>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
-                  AI Practice
-                </>
-              )}
-            </div>
-          ) : (
-            <span>Login to practice with AI</span>
-          )}
-        </button>
+        {(!startTime || isComplete) && (
+          <button
+            onClick={() => {
+              if (currentUser) {
+                setAiGeneratedtext();
+              } else {
+                navigate("/signin");
+              }
+            }}
+            className={`flex items-center px-6 py-3 text-white rounded-xl shadow-md transform transition-all hover:-translate-y-0.5 ${
+              theme === "dark"
+                ? "bg-gradient-to-r from-indigo-700 to-blue-800 hover:from-indigo-800 hover:to-blue-900"
+                : "bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700"
+            } ${loading && "opacity-50 pointer-events-none"}`}
+          >
+            {" "}
+            {currentUser ? (
+              <div className="flex items-center">
+                {loading ? (
+                  <ClipLoader size={20} color="#fff" />
+                ) : (
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 mr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
+                    </svg>
+                    AI Practice
+                  </>
+                )}
+              </div>
+            ) : (
+              <span>Login to practice with AI</span>
+            )}
+          </button>
+        )}
       </div>
 
       {/* Results section with improved dark mode styling */}

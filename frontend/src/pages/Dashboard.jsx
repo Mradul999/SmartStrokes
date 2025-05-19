@@ -3,6 +3,7 @@ import axios from "axios";
 import authStore from "../store/store.js";
 import { useRef } from "react";
 import { ThemeContext } from "../context/ThemeContext";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const { theme } = useContext(ThemeContext);
@@ -12,6 +13,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
+
+const navigate = useNavigate();
 
   const fileInputRef = useRef(null);
 
@@ -24,44 +27,44 @@ const Dashboard = () => {
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
+
     // Check file type
-    if (!file.type.match('image.*')) {
+    if (!file.type.match("image.*")) {
       setUploadError("Please select an image file");
       return;
     }
-    
+
     // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setUploadError("Image size should be less than 5MB");
       return;
     }
-    
+
     setUploading(true);
     setUploadError(null);
-    
+
     try {
       // Create form data for file upload
       const formData = new FormData();
-      formData.append('profileImage', file);
-      
+      formData.append("profileImage", file);
+
       // Send request to update profile image
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/update-profile-image`,
         formData,
-        { 
+        {
           withCredentials: true,
           headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
-      
+
       if (response.data && response.data.user) {
         // Update the user in state with new profile image
         setCurrentUser({
           ...currentUser,
-          profileImage: response.data.user.profileImage
+          profileImage: response.data.user.profileImage,
         });
       }
     } catch (error) {
@@ -75,7 +78,10 @@ const Dashboard = () => {
   // Generate a random avatar from DiceBear if no profile image exists
   const getDefaultAvatar = () => {
     // Random seed to generate different avatars
-    const seed = currentUser?.name || currentUser?.email || Math.random().toString(36).substring(2, 8);
+    const seed =
+      currentUser?.name ||
+      currentUser?.email ||
+      Math.random().toString(36).substring(2, 8);
     // Using the latest DiceBear API (version 7.x)
     return `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
   };
@@ -87,7 +93,7 @@ const Dashboard = () => {
           `${import.meta.env.VITE_API_URL}/api/result/performance`,
           { withCredentials: true }
         );
-        console.log("Performance data received:", response.data);
+        // console.log("Performance data received:", response.data);
         setPerformance(response.data);
       } catch (error) {
         console.error("Error fetching performance:", error);
@@ -101,19 +107,27 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${
-        theme === "dark" 
-          ? "bg-gray-900" 
-          : "bg-gradient-to-br from-purple-50 to-indigo-50"
-      }`}>
+      <div
+        className={`min-h-screen flex items-center justify-center ${
+          theme === "dark"
+            ? "bg-gray-900"
+            : "bg-gradient-to-br from-purple-50 to-indigo-50"
+        }`}
+      >
         <div className="relative">
-          <div className={`h-24 w-24 rounded-full border-t-4 border-b-4 ${
-            theme === "dark" ? "border-purple-500" : "border-purple-600"
-          } animate-spin`}></div>
+          <div
+            className={`h-24 w-24 rounded-full border-t-4 border-b-4 ${
+              theme === "dark" ? "border-purple-500" : "border-purple-600"
+            } animate-spin`}
+          ></div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className={`text-lg font-medium ${
-              theme === "dark" ? "text-purple-400" : "text-purple-600"
-            }`}>Loading</span>
+            <span
+              className={`text-lg font-medium ${
+                theme === "dark" ? "text-purple-400" : "text-purple-600"
+              }`}
+            >
+              Loading
+            </span>
           </div>
         </div>
       </div>
@@ -132,35 +146,39 @@ const Dashboard = () => {
   };
 
   return (
-    <div className={`min-h-screen ${
-      theme === "dark" 
-        ? "bg-gradient-to-br from-gray-900 to-gray-800" 
-        : "bg-gradient-to-br from-purple-50 to-indigo-50"
-    } py-8`}>
+    <div
+      className={`min-h-screen ${
+        theme === "dark"
+          ? "bg-gradient-to-br from-gray-900 to-gray-800"
+          : "bg-gradient-to-br from-purple-50 to-indigo-50"
+      } py-8`}
+    >
       <div className="max-w-6xl mx-auto px-4">
-        <div className={`${
-          theme === "dark" 
-            ? "bg-gray-800 border border-gray-700" 
-            : "bg-white"
-        } rounded-2xl shadow-xl p-8 mb-8 transform transition-all hover:shadow-2xl`}>
+        <div
+          className={`${
+            theme === "dark" ? "bg-gray-800 border border-gray-700" : "bg-white"
+          } rounded-2xl shadow-xl p-8 mb-8 transform transition-all hover:shadow-2xl`}
+        >
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             <div className="relative">
-              <div className={`w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden ${
-                theme === "dark" 
-                  ? "border-4 border-gray-700 shadow-lg shadow-black/20" 
-                  : "border-4 border-purple-200 shadow-md"
-              }`}>
+              <div
+                className={`w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden ${
+                  theme === "dark"
+                    ? "border-4 border-gray-700 shadow-lg shadow-black/20"
+                    : "border-4 border-purple-200 shadow-md"
+                }`}
+              >
                 <img
                   src={currentUser?.profileImage || getDefaultAvatar()}
                   alt="Profile"
-                  className="w-full h-full object-cover"              
+                  className="w-full h-full object-cover"
                 />
               </div>
               <div
                 onClick={handleEditClick}
                 className={`absolute -bottom-2 -right-2 ${
-                  theme === "dark" 
-                    ? "bg-purple-600 text-white" 
+                  theme === "dark"
+                    ? "bg-purple-600 text-white"
                     : "bg-purple-600 text-white"
                 } rounded-full w-10 h-10 flex items-center justify-center shadow-md cursor-pointer hover:opacity-90 transition-opacity`}
               >
@@ -192,31 +210,45 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="text-center md:text-left">
-              <h1 className={`text-3xl font-bold mb-1 ${
-                theme === "dark" ? "text-gray-100" : "text-gray-800"
-              }`}>
+              <h1
+                className={`text-3xl font-bold mb-1 ${
+                  theme === "dark" ? "text-gray-100" : "text-gray-800"
+                }`}
+              >
                 {currentUser?.name}
               </h1>
-              <p className={`mb-3 ${
-                theme === "dark" ? "text-gray-400" : "text-gray-500"
-              }`}>{currentUser?.email}</p>
+              <p
+                className={`mb-3 ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
+                {currentUser?.email}
+              </p>
               {uploadError && (
-                <p className={`mb-3 text-sm ${
-                  theme === "dark" ? "text-red-300" : "text-red-500"
-                }`}>{uploadError}</p>
+                <p
+                  className={`mb-3 text-sm ${
+                    theme === "dark" ? "text-red-300" : "text-red-500"
+                  }`}
+                >
+                  {uploadError}
+                </p>
               )}
-              <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${
-                theme === "dark" 
-                  ? "bg-purple-900/70 text-purple-300" 
-                  : "bg-purple-100 text-purple-700"
-              }`}>
+              <div
+                className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${
+                  theme === "dark"
+                    ? "bg-purple-900/70 text-purple-300"
+                    : "bg-purple-100 text-purple-700"
+                }`}
+              >
                 <span className="mr-1">⭐</span>
                 <span className="font-semibold">SmartStrokes</span>
-                <span className={`ml-1 text-xs px-2 py-0.5 rounded-full ${
-                  theme === "dark" 
-                    ? "bg-purple-800 text-purple-200" 
-                    : "bg-purple-200 text-purple-800"
-                }`}>
+                <span
+                  className={`ml-1 text-xs px-2 py-0.5 rounded-full ${
+                    theme === "dark"
+                      ? "bg-purple-800 text-purple-200"
+                      : "bg-purple-200 text-purple-800"
+                  }`}
+                >
                   Level{" "}
                   {Math.max(1, Math.floor((performance?.averageWpm || 0) / 10))}
                 </span>
@@ -226,34 +258,44 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className={`${
-            theme === "dark" 
-              ? "bg-gray-800 border border-gray-700" 
-              : "bg-white"
-          } rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl`}>
+          <div
+            className={`${
+              theme === "dark"
+                ? "bg-gray-800 border border-gray-700"
+                : "bg-white"
+            } rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl`}
+          >
             <div className="flex items-start justify-between">
               <div>
-                <p className={`text-lg font-semibold mb-1 ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-600"
-                }`}>
+                <p
+                  className={`text-lg font-semibold mb-1 ${
+                    theme === "dark" ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
                   Average Speed
                 </p>
                 <div className="flex items-baseline">
-                  <h3 className={`text-4xl font-bold ${
-                    theme === "dark" ? "text-purple-400" : "text-purple-600"
-                  }`}>
+                  <h3
+                    className={`text-4xl font-bold ${
+                      theme === "dark" ? "text-purple-400" : "text-purple-600"
+                    }`}
+                  >
                     {performance?.averageWpm || 0}
                   </h3>
-                  <span className={`ml-1 text-xl font-medium ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-500"
-                  }`}>
+                  <span
+                    className={`ml-1 text-xl font-medium ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
                     WPM
                   </span>
                 </div>
               </div>
-              <div className={`p-3 rounded-full ${
-                theme === "dark" ? "bg-purple-900/50" : "bg-purple-100"
-              }`}>
+              <div
+                className={`p-3 rounded-full ${
+                  theme === "dark" ? "bg-purple-900/50" : "bg-purple-100"
+                }`}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className={`h-7 w-7 ${
@@ -272,13 +314,15 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <div className={`mt-4 h-2 rounded-full overflow-hidden ${
-              theme === "dark" ? "bg-purple-900/30" : "bg-purple-100"
-            }`}>
+            <div
+              className={`mt-4 h-2 rounded-full overflow-hidden ${
+                theme === "dark" ? "bg-purple-900/30" : "bg-purple-100"
+              }`}
+            >
               <div
                 className={`h-full rounded-full ${
-                  theme === "dark" 
-                    ? "bg-gradient-to-r from-purple-500/80 to-purple-400/80" 
+                  theme === "dark"
+                    ? "bg-gradient-to-r from-purple-500/80 to-purple-400/80"
                     : "bg-gradient-to-r from-purple-400 to-purple-600"
                 }`}
                 style={{
@@ -291,34 +335,44 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className={`${
-            theme === "dark" 
-              ? "bg-gray-800 border border-gray-700" 
-              : "bg-white"
-          } rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl`}>
+          <div
+            className={`${
+              theme === "dark"
+                ? "bg-gray-800 border border-gray-700"
+                : "bg-white"
+            } rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl`}
+          >
             <div className="flex items-start justify-between">
               <div>
-                <p className={`text-lg font-semibold mb-1 ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-600"
-                }`}>
+                <p
+                  className={`text-lg font-semibold mb-1 ${
+                    theme === "dark" ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
                   Accuracy
                 </p>
                 <div className="flex items-baseline">
-                  <h3 className={`text-4xl font-bold ${
-                    theme === "dark" ? "text-blue-400" : "text-blue-500"
-                  }`}>
+                  <h3
+                    className={`text-4xl font-bold ${
+                      theme === "dark" ? "text-blue-400" : "text-blue-500"
+                    }`}
+                  >
                     {performance?.averageAccuracy || 0}
                   </h3>
-                  <span className={`ml-1 text-xl font-medium ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-500"
-                  }`}>
+                  <span
+                    className={`ml-1 text-xl font-medium ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
                     %
                   </span>
                 </div>
               </div>
-              <div className={`p-3 rounded-full ${
-                theme === "dark" ? "bg-blue-900/50" : "bg-blue-100"
-              }`}>
+              <div
+                className={`p-3 rounded-full ${
+                  theme === "dark" ? "bg-blue-900/50" : "bg-blue-100"
+                }`}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className={`h-7 w-7 ${
@@ -337,13 +391,15 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <div className={`mt-4 h-2 rounded-full overflow-hidden ${
-              theme === "dark" ? "bg-blue-900/30" : "bg-blue-100"
-            }`}>
+            <div
+              className={`mt-4 h-2 rounded-full overflow-hidden ${
+                theme === "dark" ? "bg-blue-900/30" : "bg-blue-100"
+              }`}
+            >
               <div
                 className={`h-full rounded-full ${
-                  theme === "dark" 
-                    ? "bg-gradient-to-r from-blue-500/80 to-blue-400/80" 
+                  theme === "dark"
+                    ? "bg-gradient-to-r from-blue-500/80 to-blue-400/80"
                     : "bg-gradient-to-r from-blue-400 to-blue-600"
                 }`}
                 style={{ width: `${performance?.averageAccuracy || 0}%` }}
@@ -351,34 +407,44 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className={`${
-            theme === "dark" 
-              ? "bg-gray-800 border border-gray-700" 
-              : "bg-white"
-          } rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl`}>
+          <div
+            className={`${
+              theme === "dark"
+                ? "bg-gray-800 border border-gray-700"
+                : "bg-white"
+            } rounded-2xl shadow-lg p-6 transform transition-all hover:shadow-xl`}
+          >
             <div className="flex items-start justify-between">
               <div>
-                <p className={`text-lg font-semibold mb-1 ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-600"
-                }`}>
+                <p
+                  className={`text-lg font-semibold mb-1 ${
+                    theme === "dark" ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
                   Total Tests
                 </p>
                 <div className="flex items-baseline">
-                  <h3 className={`text-4xl font-bold ${
-                    theme === "dark" ? "text-indigo-400" : "text-indigo-600"
-                  }`}>
+                  <h3
+                    className={`text-4xl font-bold ${
+                      theme === "dark" ? "text-indigo-400" : "text-indigo-600"
+                    }`}
+                  >
                     {performance?.totalTests || performance?.totalSessions || 0}
                   </h3>
-                  <span className={`ml-1 text-xl font-medium ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-500"
-                  }`}>
+                  <span
+                    className={`ml-1 text-xl font-medium ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
                     tests
                   </span>
                 </div>
               </div>
-              <div className={`p-3 rounded-full ${
-                theme === "dark" ? "bg-indigo-900/50" : "bg-indigo-100"
-              }`}>
+              <div
+                className={`p-3 rounded-full ${
+                  theme === "dark" ? "bg-indigo-900/50" : "bg-indigo-100"
+                }`}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className={`h-7 w-7 ${
@@ -397,19 +463,25 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <div className={`mt-4 h-2 rounded-full overflow-hidden ${
-              theme === "dark" ? "bg-indigo-900/30" : "bg-indigo-100"
-            }`}>
+            <div
+              className={`mt-4 h-2 rounded-full overflow-hidden ${
+                theme === "dark" ? "bg-indigo-900/30" : "bg-indigo-100"
+              }`}
+            >
               <div
                 className={`h-full rounded-full ${
-                  theme === "dark" 
-                    ? "bg-gradient-to-r from-indigo-500/80 to-indigo-400/80" 
+                  theme === "dark"
+                    ? "bg-gradient-to-r from-indigo-500/80 to-indigo-400/80"
                     : "bg-gradient-to-r from-indigo-400 to-indigo-600"
                 }`}
                 style={{
                   width: `${Math.min(
                     100,
-                    ((performance?.totalTests || performance?.totalSessions || 0) / 100) * 100
+                    ((performance?.totalTests ||
+                      performance?.totalSessions ||
+                      0) /
+                      100) *
+                      100
                   )}%`,
                 }}
               ></div>
@@ -468,7 +540,7 @@ const Dashboard = () => {
                       <td className="py-4">
                         <div className="flex items-center">
                           <span className="text-lg font-semibold text-purple-600">
-                            {session.wpm > 0 ? session.wpm : 'N/A'}
+                            {session.wpm > 0 ? session.wpm : "N/A"}
                           </span>
                           <span className="ml-1 text-sm text-gray-500">
                             WPM
@@ -478,7 +550,7 @@ const Dashboard = () => {
                       <td className="py-4">
                         <div className="flex items-center">
                           <span className="text-lg font-semibold text-blue-500">
-                            {session.accuracy > 0 ? session.accuracy : 'N/A'}
+                            {session.accuracy > 0 ? session.accuracy : "N/A"}
                           </span>
                           <span className="ml-1 text-sm text-gray-500">%</span>
                         </div>
@@ -509,14 +581,44 @@ const Dashboard = () => {
         ) : (
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 transform transition-all hover:shadow-xl text-center">
             <div className="flex flex-col items-center justify-center py-8">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-purple-200 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-16 w-16 text-purple-200 mb-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
               </svg>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">No Sessions Yet</h3>
-              <p className="text-gray-500 mb-6">Complete your first typing test to see your performance history here.</p>
-              <a href="/" className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg shadow-sm hover:bg-purple-700 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                No Sessions Yet
+              </h3>
+              <p className="text-gray-500 mb-6">
+                Complete your first typing test to see your performance history
+                here.
+              </p>
+              <a
+                href="/"
+                className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg shadow-sm hover:bg-purple-700 transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
+                  />
                 </svg>
                 Start Typing Test
               </a>
@@ -640,7 +742,12 @@ const Dashboard = () => {
                         </p>
                       </li>
                     </ul>
-                    <button className="mt-5 w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg shadow-md transition-colors flex items-center justify-center">
+                    <button
+                      onClick={() => {
+                        navigate("/");
+                      }}
+                      className="mt-5 w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg shadow-md transition-colors flex items-center justify-center"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-5 w-5 mr-2"

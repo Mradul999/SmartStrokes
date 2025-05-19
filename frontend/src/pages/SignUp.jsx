@@ -79,14 +79,14 @@ const Signup = () => {
     };
 
     try {
-      console.log("Sending registration data:", submissionData);
+      // console.log("Sending registration data:", submissionData);
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/signup`,
         submissionData
       );
 
       if (response.status === 200) {
-        console.log("Registration successful:", response.data);
+        // console.log("Registration successful:", response.data);
         setError("");
         setLoading(false);
         setVerifying(true);
@@ -99,7 +99,7 @@ const Signup = () => {
       }
     } catch (error) {
       setLoading(false);
-      console.log("Registration error:", error);
+      // console.log("Registration error:", error);
       setError(
         error.response?.data?.message || "An error occurred during registration"
       );
