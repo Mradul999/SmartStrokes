@@ -49,6 +49,7 @@ const ResetPassword = () => {
         }, 3000);
       }
     } catch (error) {
+      console.log(error);
       setError(error.response?.data?.message || "Failed to reset password");
     } finally {
       setLoading(false);
