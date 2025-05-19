@@ -7,6 +7,7 @@ import {
   updateProfileImage,
   continueWithGoogle,
   forgotPassword,
+  resetPassword,
 } from "../controllers/Auth.js";
 import upload from "../middlewares/multerUpload.js";
 

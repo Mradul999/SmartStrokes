@@ -35,6 +35,7 @@ const ResetPassword = () => {
     }
 
     try {
+      s;
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/reset-password/${token}`,
         { password: formData.password },
@@ -48,9 +49,7 @@ const ResetPassword = () => {
         }, 3000);
       }
     } catch (error) {
-      setError(
-        error.response?.data?.message || "Failed to reset password"
-      );
+      setError(error.response?.data?.message || "Failed to reset password");
     } finally {
       setLoading(false);
     }
