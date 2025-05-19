@@ -22,5 +22,6 @@ router.post(
 );
 router.post("/continuewithgoogle", continueWithGoogle);
 router.post("/forgot-password", forgotPassword);
+router.post("/reset-password/:token", resetPassword);
 
 export default router;

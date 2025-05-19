@@ -313,3 +313,41 @@ export const continueWithGoogle = async (req, res) => {
       .json({ message: "User registered Successfully", user: newUser });
   } catch (error) {}
 };
+
+export const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  try {
+    // Verify token
+    const decoded = jwt.verify(token, process.env.secret);
+    const userId = decoded.id;
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hashSync(newPassword, 10);
+
+    // Update password
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Reset link has expired" });
+    }
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid reset link" });
+    }
+    console.error(error);
+    res.status(500).json({
+      message: "Error resetting password",
+      error: error.message,
+    });
+  }
+};
