@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 const TypingBox = () => {
   const [userInput, setUserInput] = useState("");
   const [startTime, setStartTime] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(10);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [wpm, setWpm] = useState(0);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
@@ -52,7 +52,7 @@ const TypingBox = () => {
   const reset = () => {
     setUserInput("");
     setStartTime(null);
-    setTimeLeft(10);
+    setTimeLeft(60);
     setWpm(0);
     setLiveWpm(0);
     setLiveAccuracy(100);
