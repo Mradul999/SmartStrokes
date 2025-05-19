@@ -70,26 +70,29 @@ const OTPVerification = () => {
 
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/verify`,
-        { email, otp: otpValue, profileImage: pendingProfileImage }
+        { email, otp: otpValue, profileImage: pendingProfileImage },
+        { withCredentials: true }
       );
 
       if (response.status === 200) {
         setLoading(false);
-        
+
         // Store the user data in state
         setCurrentUser(response.data.user);
-        
+
         // Clear session storage
         sessionStorage.removeItem("email");
         sessionStorage.removeItem("pendingProfileImage");
-        
+
         // Navigate to dashboard
-        navigate("/dashboard");
+        navigate("/signin");
       }
     } catch (error) {
       setLoading(false);
       console.error("OTP verification error:", error);
-      setError(error.response?.data?.message || "Invalid OTP, please try again");
+      setError(
+        error.response?.data?.message || "Invalid OTP, please try again"
+      );
     }
   };
 
@@ -114,33 +117,43 @@ const OTPVerification = () => {
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes < 10 ? "0" + minutes : minutes}:${remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds}`;
+    return `${minutes < 10 ? "0" + minutes : minutes}:${
+      remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds
+    }`;
   };
 
   return (
-    <div className={`min-h-screen flex items-center justify-center ${
-      theme === "dark" 
-        ? "bg-gradient-to-tr from-gray-900 to-purple-900"
-        : "bg-gradient-to-tr from-purple-100 to-blue-100"
-    } px-4 pt-20 pb-10`}>
-      <div className={`p-8 rounded-xl shadow-xl w-full max-w-md ${
-        theme === "dark" 
-          ? "bg-gray-800 border border-gray-700" 
-          : "bg-white"
-      }`}>
-        <h2 className={`text-2xl font-bold text-center mb-6 ${
-          theme === "dark" ? "text-purple-300" : "text-purple-600"
-        }`}>
+    <div
+      className={`min-h-screen flex items-center justify-center ${
+        theme === "dark"
+          ? "bg-gradient-to-tr from-gray-900 to-purple-900"
+          : "bg-gradient-to-tr from-purple-100 to-blue-100"
+      } px-4 pt-20 pb-10`}
+    >
+      <div
+        className={`p-8 rounded-xl shadow-xl w-full max-w-md ${
+          theme === "dark" ? "bg-gray-800 border border-gray-700" : "bg-white"
+        }`}
+      >
+        <h2
+          className={`text-2xl font-bold text-center mb-6 ${
+            theme === "dark" ? "text-purple-300" : "text-purple-600"
+          }`}
+        >
           Verify Your Email
         </h2>
-        
-        <p className={`text-center mb-6 ${
-          theme === "dark" ? "text-gray-300" : "text-gray-600"
-        }`}>
+
+        <p
+          className={`text-center mb-6 ${
+            theme === "dark" ? "text-gray-300" : "text-gray-600"
+          }`}
+        >
           We've sent a 6-digit verification code to{" "}
-          <span className={`font-medium ${
-            theme === "dark" ? "text-gray-200" : "text-gray-800"
-          }`}>
+          <span
+            className={`font-medium ${
+              theme === "dark" ? "text-gray-200" : "text-gray-800"
+            }`}
+          >
             {email}
           </span>
         </p>
@@ -165,11 +178,13 @@ const OTPVerification = () => {
           </div>
 
           {error && (
-            <div className={`mb-6 p-4 rounded-lg ${
-              theme === "dark" 
-                ? "bg-red-900/60 border border-red-800 text-red-200" 
-                : "bg-red-100 border border-red-400 text-red-600"
-            }`}>
+            <div
+              className={`mb-6 p-4 rounded-lg ${
+                theme === "dark"
+                  ? "bg-red-900/60 border border-red-800 text-red-200"
+                  : "bg-red-100 border border-red-400 text-red-600"
+              }`}
+            >
               {error}
             </div>
           )}
@@ -188,14 +203,18 @@ const OTPVerification = () => {
         </form>
 
         <div className="text-center">
-          <p className={`mb-3 text-sm ${
-            theme === "dark" ? "text-gray-400" : "text-gray-500"
-          }`}>
+          <p
+            className={`mb-3 text-sm ${
+              theme === "dark" ? "text-gray-400" : "text-gray-500"
+            }`}
+          >
             Didn't receive the code?{" "}
             {countdownActive ? (
-              <span className={`font-medium ${
-                theme === "dark" ? "text-purple-400" : "text-purple-600"
-              }`}>
+              <span
+                className={`font-medium ${
+                  theme === "dark" ? "text-purple-400" : "text-purple-600"
+                }`}
+              >
                 {formatTime(countdown)}
               </span>
             ) : (
@@ -203,7 +222,9 @@ const OTPVerification = () => {
                 onClick={resendOtp}
                 disabled={loading}
                 className={`font-medium ${
-                  theme === "dark" ? "text-purple-400 hover:text-purple-300" : "text-purple-600 hover:text-purple-700"
+                  theme === "dark"
+                    ? "text-purple-400 hover:text-purple-300"
+                    : "text-purple-600 hover:text-purple-700"
                 }`}
               >
                 Resend OTP
