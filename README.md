@@ -33,6 +33,14 @@ SmartStrokes is a modern, feature-rich typing test platform that helps users imp
 - **Progress Tracking**: Save and review your typing history
 - **Weak Key Analysis**: Identifies keys that need improvement
 
+### Authentiation  and state
+Google Authentication: Sign in securely using your Google account via Firebase
+Zustand State Management: Lightweight and scalable global state management
+
+### Firebase Storage
+Firebase Integration: Store user-generated data (test results, preferences) securely
+Cloud Storage: Upload files or statistics for persistent storage
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -118,25 +126,5 @@ npm run dev
 - Protected API endpoints
 - Secure session management
 
-## 🤝 Contributing
+Try it now: [SmartStrokes Live Demo](https://smart-strokes.vercel.app/)
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👥 Authors
-
-- Your Name - Initial work
-
-## �� Acknowledgments
-
-- Thanks to all contributors who have helped shape this project
-- Inspired by the need for better typing practice tools
