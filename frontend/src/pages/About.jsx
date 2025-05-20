@@ -14,7 +14,7 @@ const About = () => {
       description: "Specializes in React.js and Node.js development with a focus on creating intuitive user interfaces and robust backend systems."
     },
     {
-      name: "Mradul",
+      name: "Mradul Verma",
       role: "Full Stack Developer",
       github: "https://github.com/Mradul999",
       image: "mradul.jpeg",
