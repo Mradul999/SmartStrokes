@@ -5,12 +5,6 @@ SmartStrokes is a modern, feature-rich typing test platform that helps users imp
 ## 🌟 Features
 
 ### Core Features
-- **Real-time Typing Test**: 60-second timed typing tests with instant feedback
-- **Live Performance Metrics**: 
-  - Words Per Minute (WPM) tracking
-  - Real-time accuracy monitoring
-  - Character-level error detection
-  - Progress tracking
 
 ### AI-Powered Learning
 - **Smart Practice**: AI-generated text based on your problem keys
