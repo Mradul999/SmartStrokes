@@ -147,7 +147,13 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    res.clearCookie("access-token");
+    res.clearCookie("access-token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // true in production
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // important for cross-origin requests
+      maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+      path: "/", // make cookie available for all paths
+    });
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
     console.log(error);
