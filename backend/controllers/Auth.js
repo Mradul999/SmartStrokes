@@ -312,7 +312,10 @@ export const continueWithGoogle = async (req, res) => {
     res
       .cookie("access-token", token, {
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
+        secure: process.env.NODE_ENV === "production", // true in production
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // important for cross-origin requests
+        maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+        path: "/", // make cookie available for all paths
       })
       .status(201)
       .json({ message: "User registered Successfully", user: newUser });
