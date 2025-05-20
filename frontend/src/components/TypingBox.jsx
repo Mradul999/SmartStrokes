@@ -31,16 +31,30 @@ const TypingBox = () => {
   const [isFocused, setIsFocused] = useState(false);
   const [visibleLineStart, setVisibleLineStart] = useState(0);
   const [linesPerView, setLinesPerView] = useState(3);
+  const [isMobile, setIsMobile] = useState(false);
 
   const navigate = useNavigate();
   const textBoxRef = useRef(null);
   const timerRef = useRef(null);
   const livePerfRef = useRef(null);
   const textDisplayRef = useRef(null);
+  const mobileInputRef = useRef(null);
 
   const currentUser = auhtStore((state) => state.currentUser);
   const setTypingresult = TypingresultStore((state) => state.setTypingresult);
   const { theme } = useContext(ThemeContext);
+
+  useEffect(() => {
+    // Check if device is mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     setRandomParagraph();
@@ -62,7 +76,9 @@ const TypingBox = () => {
     setWrongKeyPresses([]);
     setWeakKeyStats({});
     setVisibleLineStart(0);
-    if (textBoxRef.current) {
+    if (isMobile && mobileInputRef.current) {
+      mobileInputRef.current.focus();
+    } else if (textBoxRef.current) {
       textBoxRef.current.focus();
     }
   };
@@ -736,28 +752,51 @@ const TypingBox = () => {
       {showKeyboard && renderKeyboard()}
 
       {/* Main typing area with enhanced dark mode appearance */}
-      <div
-        ref={textBoxRef}
-        tabIndex={0}
-        onKeyDown={handleKeyDown}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        className={`mb-6 p-6 md:p-10 rounded-xl outline-none transition-colors duration-200 ${
-          theme === "dark"
-            ? "bg-gradient-to-b from-gray-800 to-gray-900 border border-gray-700 focus:ring-2 focus:ring-purple-500"
-            : "bg-white border border-gray-200 shadow-lg focus:ring-2 focus:ring-purple-300"
-        } ${
-          isFocused
-            ? theme === "dark"
-              ? "ring-2 ring-purple-500"
-              : "ring-2 ring-purple-300"
-            : ""
-        }`}
-      >
-        {renderText()}
+      <div className="relative mb-6">
+        <input
+          ref={textBoxRef}
+          type="text"
+          value={userInput}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value.length > sampleText.length) return;
+            setUserInput(value);
+            setCursorPosition(value.length);
+          }}
+          onKeyDown={handleKeyDown}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          className={`w-full h-[250px] p-4 md:p-10 rounded-xl outline-none transition-colors duration-200 text-transparent caret-transparent resize-none ${
+            theme === "dark"
+              ? "bg-gradient-to-b from-gray-800 to-gray-900 border border-gray-700 focus:ring-2 focus:ring-purple-500"
+              : "bg-white border border-gray-200 shadow-lg focus:ring-2 focus:ring-purple-300"
+          } ${
+            isFocused
+              ? theme === "dark"
+                ? "ring-2 ring-purple-500"
+                : "ring-2 ring-purple-300"
+              : ""
+          }`}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck="false"
+        />
+        <div className="absolute inset-0 p-4 md:p-10 pointer-events-none overflow-y-auto">
+          {renderText()}
+        </div>
+
+        {/* {!startTime && !isComplete && (
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-purple-100 text-purple-700 px-4 py-2 rounded-lg text-sm font-medium animate-pulse flex items-center pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Type to start!
+          </div>
+        )} */}
 
         <div
-          className={`mt-4 text-xs ${
+          className={`mt-4 text-xs hidden sm:block  ${
             theme === "dark" ? "text-gray-400" : "text-gray-500"
           }`}
         >
@@ -1173,7 +1212,20 @@ const TypingBox = () => {
         </div>
       )}
 
+      {/* Add mobile-specific styles */}
       <style jsx>{`
+        @media (max-width: 768px) {
+          input[type="text"] {
+            font-size: 16px !important; /* Prevents zoom on iOS */
+            -webkit-text-fill-color: transparent !important; /* Hides text on iOS */
+            -webkit-appearance: none;
+            margin: 0;
+          }
+          
+          .absolute.inset-0 {
+            font-size: 14px;
+            line-height: 1.5;
+          }
         .active-word {
           position: relative;
         }
