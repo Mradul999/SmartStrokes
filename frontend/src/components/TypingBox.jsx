@@ -782,7 +782,7 @@ const TypingBox = () => {
           autoCapitalize="off"
           spellCheck="false"
         />
-        <div className="absolute inset-0 p-4 md:p-10 pointer-events-none overflow-y-auto">
+        <div className="absolute inset-0 p-4 md:p-10 pointer-events-none overflow-y-hidden">
           {renderText()}
         </div>
 
