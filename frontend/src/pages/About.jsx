@@ -10,14 +10,14 @@ const About = () => {
       name: "Prashant Kumar",
       role: "Full Stack Developer",
       github: "https://github.com/Prashantkumar999",
-      image: "https://avatars.githubusercontent.com/u/Prashantkumar999",
+      image: "prashant.jpeg",
       description: "Specializes in React.js and Node.js development with a focus on creating intuitive user interfaces and robust backend systems."
     },
     {
       name: "Mradul",
       role: "Full Stack Developer",
       github: "https://github.com/Mradul999",
-      image: "https://avatars.githubusercontent.com/u/Mradul999",
+      image: "mradul.jpeg",
       description: "Expert in modern JavaScript frameworks with experience in developing responsive web applications and RESTful APIs."
     }
   ];
@@ -181,10 +181,10 @@ const About = () => {
                   ? "bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700" 
                   : "bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100"
               }`}>
-                <div className={`w-24 h-24 rounded-full overflow-hidden border-4 shadow-md ${
+                <div className={`w-56 h-24 rounded-full overflow-hidden border-4 shadow-md ${
                   theme === "dark" ? "border-gray-700" : "border-white"
                 }`}>
-                  <img src={dev.image} alt={dev.name} className="w-full h-full object-cover" />
+                  <img src={dev.image} alt={dev.name} className="w-full h-full rounded-full object-cover" />
                 </div>
                 <div>
                   <h3 className={`text-xl font-bold mb-1 ${
