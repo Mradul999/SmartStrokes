@@ -114,11 +114,11 @@ const Header = () => {
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-8 w-8 mr-2"
+                className="h-6 w-6 mr-1 sm:h-8 sm:w-8 sm:mr-2" // smaller on mobile
               >
                 <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
               </svg>
-              <span className="text-2xl font-bold tracking-tight">
+              <span className="text-xl font-semibold tracking-tight sm:text-2xl sm:font-bold">
                 SmartStrokes
               </span>
             </div>
@@ -131,7 +131,7 @@ const Header = () => {
 
             <NavLink
               to="/about"
-              className={`flex items-center py-2 px-4 rounded-lg text-sm font-medium transition-all ${
+              className={`hidden   sm:flex items-center py-2 px-4 rounded-lg text-sm font-medium transition-all ${
                 isActive("/about") ? linkBgActive : linkBgNormal
               }`}
             >
@@ -140,7 +140,7 @@ const Header = () => {
 
             <NavLink
               to="/contact"
-              className={`flex items-center py-2 px-4 rounded-lg text-sm font-medium transition-all ${
+              className={` hidden sm:flex items-center py-2 px-4 rounded-lg text-sm font-medium transition-all ${
                 isActive("/contact") ? linkBgActive : linkBgNormal
               }`}
             >
@@ -151,7 +151,7 @@ const Header = () => {
               <>
                 <NavLink
                   to="/signup"
-                  className={`hidden sm:flex items-center py-2 px-4 rounded-lg text-sm font-medium transition-all ${
+                  className={` flex items-center py-2 px-4 rounded-lg text-sm font-medium transition-all ${
                     isActive("/signup") ? linkBgActive : linkBgNormal
                   }`}
                 >
