@@ -185,26 +185,6 @@ const Footer = () => {
                     Home
                   </NavLink>
                 </li>
-                <li>
-                  <NavLink
-                    to="/dashboard"
-                    className={({ isActive }) =>
-                      `${
-                        theme === "dark"
-                          ? "text-gray-300 hover:text-purple-400"
-                          : "text-gray-600 hover:text-purple-600"
-                      } transition-colors ${
-                        isActive
-                          ? theme === "dark"
-                            ? "text-purple-400 font-medium"
-                            : "text-purple-600 font-medium"
-                          : ""
-                      }`
-                    }
-                  >
-                    Dashboard
-                  </NavLink>
-                </li>
 
                 <li>
                   <NavLink
