@@ -4,8 +4,6 @@ dotenv.config();
 
 export const sendContactEmail = async (name, email, subject, message) => {
   try {
-    console.log("Preparing to send contact email");
-    
     const mailOptions = {
       from: `"Contact Form - SmartStrokes" <${process.env.EMAIL}>`,
       to: "prashant047alg@gmail.com",
@@ -30,23 +28,10 @@ export const sendContactEmail = async (name, email, subject, message) => {
       `,
     };
     
-    console.log("Mail options configured:", {
-      from: mailOptions.from,
-      to: mailOptions.to,
-      subject: mailOptions.subject
-    });
-    
     const info = await transporter.sendMail(mailOptions);
     
-    console.log("Email sent successfully:", info.messageId);
     return info;
   } catch (error) {
-    console.error("Error sending contact email:", error);
-    console.error("Error details:", {
-      message: error.message,
-      code: error.code,
-      command: error.command
-    });
     throw error;
   }
-}; 
+};

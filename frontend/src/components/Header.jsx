@@ -15,7 +15,6 @@ const Header = () => {
   const location = useLocation();
   const menuRef = useRef();
 
-  // Handle scrolling effect
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 20) {
@@ -31,7 +30,6 @@ const Header = () => {
     };
   }, []);
 
-  // Close the dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -56,12 +54,10 @@ const Header = () => {
     } catch (error) {}
   };
 
-  // Check if the route is active
   const isActive = (path) => {
     return location.pathname === path;
   };
 
-  // Determine header background based on theme and scroll state
   let headerBg;
   if (theme === "dark") {
     headerBg = scrolled
@@ -73,7 +69,6 @@ const Header = () => {
       : "bg-gradient-to-r from-purple-600 to-indigo-600";
   }
 
-  // Determine text and link colors based on theme and scroll state
   const textColor =
     theme === "dark"
       ? scrolled
@@ -130,12 +125,10 @@ const Header = () => {
           </NavLink>
 
           <div className="flex items-center gap-2 md:gap-4">
-            {/* Theme Toggle */}
             <div className="mr-2">
               <ThemeToggle size="sm" />
             </div>
 
-            {/* About link - visible to all users */}
             <NavLink
               to="/about"
               className={`flex items-center py-2 px-4 rounded-lg text-sm font-medium transition-all ${
@@ -145,7 +138,6 @@ const Header = () => {
               About
             </NavLink>
 
-            {/* Contact link - visible to all users */}
             <NavLink
               to="/contact"
               className={`flex items-center py-2 px-4 rounded-lg text-sm font-medium transition-all ${

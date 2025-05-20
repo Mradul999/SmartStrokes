@@ -4,21 +4,18 @@ import { ThemeContext } from "../context/ThemeContext";
 const ThemeToggle = ({ className = "", size = "md", showLabel = false }) => {
   const { theme, toggleTheme } = useContext(ThemeContext);
   
-  // Determine size class
   const sizeClass = {
     sm: "w-10 h-5",
     md: "w-12 h-6",
     lg: "w-14 h-7"
   }[size] || "w-12 h-6";
   
-  // Determine circle size based on toggle size
   const circleSize = {
     sm: "w-3.5 h-3.5",
     md: "w-5 h-5",
     lg: "w-6 h-6"
   }[size] || "w-5 h-5";
   
-  // Determine transform class for circle position
   const translateX = {
     sm: "translate-x-5",
     md: "translate-x-6",
@@ -78,4 +75,4 @@ const ThemeToggle = ({ className = "", size = "md", showLabel = false }) => {
   );
 };
 
-export default ThemeToggle; 
+export default ThemeToggle;

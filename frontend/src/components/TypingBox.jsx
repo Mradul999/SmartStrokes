@@ -73,7 +73,6 @@ const TypingBox = () => {
     );
     let originalText = sampleParagraphs.paragraphs[randomIndex];
 
-    // If the paragraph is too short, concatenate multiple paragraphs
     while (originalText.split(" ").length < 250) {
       const nextRandomIndex = Math.floor(
         Math.random() * sampleParagraphs.paragraphs.length
@@ -81,11 +80,9 @@ const TypingBox = () => {
       originalText += " " + sampleParagraphs.paragraphs[nextRandomIndex];
     }
 
-    // Limit to around 300 words
     const words = originalText.split(" ");
     const shortenedWords = words.length > 300 ? words.slice(0, 300) : words;
 
-    // Join back into a paragraph
     const newText = shortenedWords.join(" ");
 
     setSampleText(newText);
@@ -111,17 +108,14 @@ const TypingBox = () => {
     return () => clearInterval(timerRef.current);
   }, [startTime]);
 
-  // Update live WPM and accuracy every 2 seconds
   useEffect(() => {
     if (startTime && !isComplete && timeLeft > 0) {
       livePerfRef.current = setInterval(() => {
-        // Calculate live WPM
         const timeElapsed = (Date.now() - startTime) / 60000;
         const wordsTyped = userInput.trim().split(/\s+/).length;
         const currentWpm = Math.floor(wordsTyped / (timeElapsed || 0.001));
         setLiveWpm(currentWpm);
 
-        // Calculate live accuracy
         setLiveAccuracy(calculateAccuracy());
       }, 2000);
     }
@@ -143,15 +137,12 @@ const TypingBox = () => {
       const calculatedWpm = Math.floor(wordsTyped / timeElapsed);
       setWpm(calculatedWpm);
 
-      // Format weakKeyStats for MongoDB Map storage
       const formattedWeakKeyStats = {};
 
-      // Copy the weakKeyStats object properties
       Object.keys(weakKeyStats).forEach((key) => {
         formattedWeakKeyStats[key] = weakKeyStats[key];
       });
 
-      // Calculate correct and incorrect characters
       let correctChars = 0;
       let incorrectChars = 0;
 
@@ -178,24 +169,20 @@ const TypingBox = () => {
       setTypingresult(result);
 
       if (currentUser) {
-        // console.log("Saving result:", result);
         saveResult(result);
       }
     }
   }, [userInput, startTime, isComplete, timeLeft]);
 
-  // Add this useEffect to handle line advancement
   useEffect(() => {
     if (!startTime || isComplete) return;
 
-    // Get the current position within the formatted text
     const words = sampleText.split(" ");
     const lines = [];
     for (let i = 0; i < words.length; i += 10) {
       lines.push(words.slice(i, i + 10));
     }
 
-    // Determine which line we're on based on cursor position
     const currentCharIndex = userInput.length;
     let charCount = 0;
     let currentLineIndex = 0;

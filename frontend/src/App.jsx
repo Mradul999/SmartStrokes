@@ -17,27 +17,6 @@ import { ThemeProvider } from "./context/ThemeContext";
 import Test from "./pages/Test";
 
 function App() {
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  if (!isDesktop) {
-    return (
-      <div className="h-screen flex items-center justify-center text-center px-4">
-        <h1 className="text-xl font-semibold">
-          Website is only available for desktop devices.
-        </h1>
-      </div>
-    );
-  }
-
   return (
     <ThemeProvider>
       <BrowserRouter>

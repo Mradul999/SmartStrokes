@@ -6,7 +6,6 @@ export const submitContactForm = async (req, res) => {
     
     const { name, email, subject, message } = req.body;
     
-    // Validate required fields
     if (!name || !email || !subject || !message) {
       console.log("Missing required fields:", { name, email, subject, message });
       return res.status(400).json({ 
@@ -15,7 +14,6 @@ export const submitContactForm = async (req, res) => {
       });
     }
     
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       console.log("Invalid email format:", email);
@@ -31,12 +29,10 @@ export const submitContactForm = async (req, res) => {
       subject: `Contact Form: ${subject}`
     });
     
-    // Send contact email
     await sendContactEmail(name, email, subject, message);
     
     console.log("Email sent successfully");
     
-    // Return success response
     return res.status(200).json({
       success: true,
       message: "Your message has been sent successfully. We'll get back to you soon!"
@@ -55,4 +51,4 @@ export const submitContactForm = async (req, res) => {
       message: "Sorry, there was an error sending your message. Please try again later."
     });
   }
-}; 
+};

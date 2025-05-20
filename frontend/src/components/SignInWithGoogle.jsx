@@ -15,7 +15,6 @@ const SignInWithGoogle = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      // console.log("Signed in as:", result.user);
 
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/continuewithgoogle`,
@@ -24,16 +23,9 @@ const SignInWithGoogle = () => {
       );
 
       if (response.status === 200 || 201) {
-        // console.log(response.data.user);
         setCurrentUser(response.data.user);
         navigate("/");
       }
-
-      //   if (response.status === 201) {
-      //     console.log(response.data);
-      //     setCurrentUser(response.data.user);
-      //     navigate("/");
-      //   }
     } catch (error) {
       console.error("Error during sign-in:", error.message);
     }
