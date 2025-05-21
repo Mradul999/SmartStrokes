@@ -768,7 +768,7 @@ const TypingBox = () => {
           onBlur={() => setIsFocused(false)}
           className={`w-full h-[250px] p-4 md:p-10 rounded-xl outline-none transition-colors duration-200 text-transparent caret-transparent resize-none ${
             theme === "dark"
-              ? "bg-gradient-to-b from-gray-800 to-gray-900 border border-gray-700 focus:ring-2 focus:ring-purple-500"
+              ? "bg-gradient-to-b from-gray-800 to-gray-900 border border-gray-700 focus:ring-2 focus:ring-purple-500 [color-scheme:dark]"
               : "bg-white border border-gray-200 shadow-lg focus:ring-2 focus:ring-purple-300"
           } ${
             isFocused
@@ -782,21 +782,14 @@ const TypingBox = () => {
           autoCapitalize="off"
           spellCheck="false"
         />
-        <div className="absolute inset-0 p-4 md:p-10 pointer-events-none overflow-y-hidden">
+        <div className="absolute inset-0 p-4 md:p-10 pointer-events-none overflow-y-auto">
           {renderText()}
         </div>
 
-        {/* {!startTime && !isComplete && (
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-purple-100 text-purple-700 px-4 py-2 rounded-lg text-sm font-medium animate-pulse flex items-center pointer-events-none">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            Type to start!
-          </div>
-        )} */}
+        
 
         <div
-          className={`mt-4 text-xs hidden sm:block  ${
+          className={`mt-4 text-xs ${
             theme === "dark" ? "text-gray-400" : "text-gray-500"
           }`}
         >
@@ -1226,6 +1219,15 @@ const TypingBox = () => {
             font-size: 14px;
             line-height: 1.5;
           }
+        }
+
+        /* Ensure text is hidden in dark mode */
+        .dark-theme input[type="text"] {
+          color: transparent !important;
+          -webkit-text-fill-color: transparent !important;
+          text-fill-color: transparent !important;
+        }
+
         .active-word {
           position: relative;
         }
