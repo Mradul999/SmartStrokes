@@ -31,9 +31,9 @@ SmartStrokes is a modern, feature-rich typing test platform that helps users imp
 Google Authentication: Sign in securely using your Google account via Firebase
 Zustand State Management: Lightweight and scalable global state management
 
-### Firebase Storage
-Firebase Integration: Store user-generated data (test results, preferences) securely
-Cloud Storage: Upload files or statistics for persistent storage
+### Cloudinary Storage
+
+ Upload user profile pic
 
 ## 🚀 Getting Started
 
