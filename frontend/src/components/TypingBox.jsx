@@ -1221,6 +1221,17 @@ const TypingBox = () => {
           }
         }
 
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .absolute.inset-0::-webkit-scrollbar {
+          display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .absolute.inset-0 {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+
         /* Ensure text is hidden in dark mode */
         .dark-theme input[type="text"] {
           color: transparent !important;
