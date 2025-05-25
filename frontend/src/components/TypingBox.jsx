@@ -556,7 +556,7 @@ const TypingBox = () => {
   const getSkillLevelColor = () => {
     const level = calculateSkillLevel();
 
-    if (theme === "dark") {
+    if (theme === "dark") {           
       switch (level) {
         case "Master":
           return "text-yellow-300";
@@ -766,7 +766,7 @@ const TypingBox = () => {
           onKeyDown={handleKeyDown}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className={`w-full h-[250px] p-4 md:p-10 rounded-xl outline-none transition-colors duration-200 text-transparent caret-transparent resize-none ${
+          className={`w-full  h-[300px] p-4 md:p-10 rounded-xl outline-none transition-colors duration-200 text-transparent caret-transparent resize-none ${
             theme === "dark"
               ? "bg-gradient-to-b from-gray-800 to-gray-900 border border-gray-700 focus:ring-2 focus:ring-purple-500 [color-scheme:dark]"
               : "bg-white border border-gray-200 shadow-lg focus:ring-2 focus:ring-purple-300"
@@ -789,7 +789,7 @@ const TypingBox = () => {
         
 
         <div
-          className={`mt-4 text-xs ${
+          className={`mt-4 text-xs hidden sm:block ${
             theme === "dark" ? "text-gray-400" : "text-gray-500"
           }`}
         >

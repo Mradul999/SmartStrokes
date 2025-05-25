@@ -15,6 +15,7 @@ import Terms from "./pages/Terms";
 import Layout from "./components/Layout";
 import { ThemeProvider } from "./context/ThemeContext";
 import Test from "./pages/Test";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (
@@ -44,7 +45,9 @@ function App() {
               }
             />
             <Route path="/otp-verification" element={<OTPVerification />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<PrivateRoute >
+              <Dashboard/>
+            </PrivateRoute>} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/test" element={<Test />} />

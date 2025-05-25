@@ -8,13 +8,14 @@ import { useNavigate } from "react-router-dom";
 const Dashboard = () => {
   const { theme } = useContext(ThemeContext);
   const currentUser = authStore((state) => state.currentUser);
+  console.log("current user is ", currentUser);
   const setCurrentUser = authStore((state) => state.setCurrentUser);
   const [performance, setPerformance] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
 
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const fileInputRef = useRef(null);
 
