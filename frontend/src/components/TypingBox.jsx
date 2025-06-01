@@ -39,6 +39,7 @@ const TypingBox = () => {
   const livePerfRef = useRef(null);
   const textDisplayRef = useRef(null);
   const mobileInputRef = useRef(null);
+  const resultsRef = useRef(null);
 
   const currentUser = auhtStore((state) => state.currentUser);
   const setTypingresult = TypingresultStore((state) => state.setTypingresult);
@@ -225,6 +226,12 @@ const TypingBox = () => {
     startTime,
     isComplete,
   ]);
+
+  useEffect(() => {
+    if (isComplete && resultsRef.current) {
+      resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [isComplete]);
 
   const handleKeyDown = (e) => {
     if (isComplete || timeLeft <= 0) {
@@ -873,7 +880,7 @@ const TypingBox = () => {
 
       {/* Results section with improved dark mode styling */}
       {isComplete && (
-        <div className="mt-6 space-y-5">
+        <div ref={resultsRef} className="mt-6 space-y-5">
           <div
             className={`rounded-xl p-6 shadow-sm ${
               theme === "dark"
