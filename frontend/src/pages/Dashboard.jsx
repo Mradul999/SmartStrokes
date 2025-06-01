@@ -4,6 +4,8 @@ import authStore from "../store/store.js";
 import { useRef } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
+import { LuSpace } from "react-icons/lu";
+
 
 const Dashboard = () => {
   const { theme } = useContext(ThemeContext);
@@ -675,7 +677,8 @@ const Dashboard = () => {
                         >
                           <div className="text-center">
                             <span className="inline-block w-10 h-10 rounded-lg bg-white border border-purple-200 shadow-inner flex items-center justify-center text-xl font-mono font-bold text-purple-700">
-                              {key}
+                              {key==" "?<LuSpace/>:key}
+                            
                             </span>
                             <div className="mt-2 text-xs font-semibold text-purple-700">
                               {count} errors
@@ -704,7 +707,8 @@ const Dashboard = () => {
                     </svg>
                     Recommendations
                   </h3>
-                  <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-100 p-6 shadow-sm">
+                 
+                  <div className={`${theme=="dark"?"bg-gray-800":"bg-purple-50"} px-4 text-lg py-6  border shadow-xl rounded-lg   `}>
                     <ul className="space-y-3">
                       <li className="flex items-start">
                         <span className="flex-shrink-0 h-6 w-6 flex items-center justify-center rounded-full bg-purple-100 text-purple-600 mr-3">

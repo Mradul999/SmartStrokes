@@ -4,8 +4,13 @@ import app from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import authStore from "../store/store.js";
 import axios from "axios";
+import { FcGoogle } from "react-icons/fc";
+import { ThemeContext } from "../context/ThemeContext";
+import { useContext } from "react";
+
 
 const SignInWithGoogle = () => {
+  const {theme} = useContext(ThemeContext)
   const navigate = useNavigate();
   const setCurrentUser = authStore((state) => state?.setCurrentUser);
   const handleGoogleSignIn = async () => {
@@ -36,8 +41,9 @@ const SignInWithGoogle = () => {
       <button
         type="button"
         onClick={handleGoogleSignIn}
-        className="bg-red-500 text-white w-full font-semibold py-2 px-4  rounded-lg hover:bg-red-600"
+        className={`border bg-white w-full font-semibold py-2 px-4 rounded-lg flex justify-center items-center gap-2 ${theme =="dark"?"text-white":"text-black"} ${theme=="dark"?"hover:bg-gray-600":"hover:bg-gray-100"} `}
       >
+        <FcGoogle className="text-xl"/>
         Continue with Google
       </button>
     </div>

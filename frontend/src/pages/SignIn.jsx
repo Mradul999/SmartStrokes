@@ -173,7 +173,7 @@ const Signin = () => {
           </a>
         </div>
         <div
-          className={`mt-6 text-center text-sm ${
+          className={`mt-[1.2px] text-center text-sm ${
             theme === "dark" ? "text-gray-400" : "text-gray-600"
           }`}
         >
