@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "backend": "^0.0.0",
-    "bcryptjs": "^3.0.2",
-    "chart.js": "^4.4.9",
-    "cookie-parser": "^1.4.7",
-    "react-chartjs-2": "^5.3.0"
-  }
-}
