@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 const TypingBox = () => {
   const [userInput, setUserInput] = useState("");
   const [startTime, setStartTime] = useState(null);
+  // const [userSelectedtime, SetUserSelectedtime] = useState(60);
   const [timeLeft, setTimeLeft] = useState(60);
   const [wpm, setWpm] = useState(0);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -50,11 +51,11 @@ const TypingBox = () => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   useEffect(() => {
@@ -229,7 +230,7 @@ const TypingBox = () => {
 
   useEffect(() => {
     if (isComplete && resultsRef.current) {
-      resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      resultsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, [isComplete]);
 
@@ -563,7 +564,7 @@ const TypingBox = () => {
   const getSkillLevelColor = () => {
     const level = calculateSkillLevel();
 
-    if (theme === "dark") {           
+    if (theme === "dark") {
       switch (level) {
         case "Master":
           return "text-yellow-300";
@@ -663,46 +664,55 @@ const TypingBox = () => {
             </div>
           </div>
 
-          {/* <div
-            className={`h-12 w-0.5 ${
-              theme === "dark" ? "bg-gray-700" : "bg-gray-200"
-            }`}
-          ></div> */}
-
-          {/* <div className="flex flex-col items-center">
-            <div
-              className={`text-xs uppercase tracking-wide mb-1 ${
-                theme === "dark" ? "text-gray-400" : "text-gray-500"
-              }`}
-            >
-              WPM
-            </div>
-            <div className="text-2xl font-bold text-purple-600">
-              {startTime ? liveWpm : "-"}
-            </div>
-          </div> */}
-
-          {/* <div
-            className={`h-12 w-0.5 ${
-              theme === "dark" ? "bg-gray-700" : "bg-gray-200"
-            }`}
-          ></div> */}
-
-          {/* <div className="flex flex-col items-center">
-            <div
-              className={`text-xs uppercase tracking-wide mb-1 ${
-                theme === "dark" ? "text-gray-400" : "text-gray-500"
-              }`}
-            >
-              Accuracy
-            </div>
-            <div className="text-2xl font-bold text-blue-500">
-              {startTime ? liveAccuracy : "-"}%
-            </div>
-          </div> */}
+          {/* <div></div> */}
         </div>
 
         <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-1  ">
+            <h1
+              className={`text-xs uppercase tracking-wide  ${
+                theme === "dark" ? "text-gray-400" : "text-gray-500"
+              }`}
+            >
+              Chose Time
+            </h1>
+            <ul
+              className={`text-sm font-medium flex  gap-2 ${
+                theme === "dark" ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              <li
+                className={`cursor-default ${
+                  timeLeft === 30 && "text-violet-500"
+                }`}
+                onClick={(e) => {
+                  setTimeLeft(30);
+                }}
+              >
+                30
+              </li>
+              <li
+                className={`cursor-default ${
+                  timeLeft === 60 && "text-violet-500"
+                }`}
+                onClick={(e) => {
+                  setTimeLeft(60);
+                }}
+              >
+                60
+              </li>
+              <li
+                className={`cursor-default ${
+                  timeLeft === 120 && "text-violet-500"
+                }`}
+                onClick={(e) => {
+                  setTimeLeft(120);
+                }}
+              >
+                120
+              </li>
+            </ul>
+          </div>
           <div className="flex flex-col items-center">
             <div
               className={`text-xs uppercase tracking-wide mb-1 ${
@@ -793,8 +803,6 @@ const TypingBox = () => {
           {renderText()}
         </div>
 
-        
-
         <div
           className={`mt-4 text-xs hidden sm:block ${
             theme === "dark" ? "text-gray-400" : "text-gray-500"
@@ -829,7 +837,11 @@ const TypingBox = () => {
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
             />
           </svg>
-          {(timeLeft == 60 || isComplete) && "New Text"}
+          {(timeLeft == 60 ||
+            timeLeft == 30 ||
+            timeLeft == 120 ||
+            isComplete) &&
+            "New Text"}
         </button>
         {(!startTime || isComplete) && (
           <button
@@ -1221,7 +1233,7 @@ const TypingBox = () => {
             -webkit-appearance: none;
             margin: 0;
           }
-          
+
           .absolute.inset-0 {
             font-size: 14px;
             line-height: 1.5;
@@ -1235,8 +1247,8 @@ const TypingBox = () => {
 
         /* Hide scrollbar for IE, Edge and Firefox */
         .absolute.inset-0 {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
         }
 
         /* Ensure text is hidden in dark mode */
