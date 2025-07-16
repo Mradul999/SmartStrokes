@@ -6,7 +6,6 @@ import { ThemeContext } from "../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
 import { LuSpace } from "react-icons/lu";
 
-
 const Dashboard = () => {
   const { theme } = useContext(ThemeContext);
   const currentUser = authStore((state) => state.currentUser);
@@ -158,7 +157,7 @@ const Dashboard = () => {
     >
       <div className="max-w-6xl mx-auto px-4">
         <div
-          className={`${
+          className={`flex flex-row justify-between w-full ${
             theme === "dark" ? "bg-gray-800 border border-gray-700" : "bg-white"
           } rounded-2xl shadow-xl p-8 mb-8 transform transition-all hover:shadow-2xl`}
         >
@@ -257,6 +256,18 @@ const Dashboard = () => {
                 </span>
               </div>
             </div>
+          </div>
+          <div className="bg-[#2A2A3D]  rounded-xl text-white w-64 shadow-md">
+            <h3 className="text-lg font-semibold mb-2">Upgrade Plan</h3>
+            <p className="text-sm text-gray-400 mb-4">
+              Access more features with a premium subscription.
+            </p>
+            <button
+              onClick={() => (navigate("/subscription"))}
+              className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition"
+            >
+              View Plans
+            </button>
           </div>
         </div>
 
@@ -677,8 +688,7 @@ const Dashboard = () => {
                         >
                           <div className="text-center">
                             <span className="inline-block w-10 h-10 rounded-lg bg-white border border-purple-200 shadow-inner flex items-center justify-center text-xl font-mono font-bold text-purple-700">
-                              {key==" "?<LuSpace/>:key}
-                            
+                              {key == " " ? <LuSpace /> : key}
                             </span>
                             <div className="mt-2 text-xs font-semibold text-purple-700">
                               {count} errors
@@ -707,8 +717,12 @@ const Dashboard = () => {
                     </svg>
                     Recommendations
                   </h3>
-                 
-                  <div className={`${theme=="dark"?"bg-gray-800":"bg-purple-50"} px-4 text-lg py-6  border shadow-xl rounded-lg   `}>
+
+                  <div
+                    className={`${
+                      theme == "dark" ? "bg-gray-800" : "bg-purple-50"
+                    } px-4 text-lg py-6  border shadow-xl rounded-lg   `}
+                  >
                     <ul className="space-y-3">
                       <li className="flex items-start">
                         <span className="flex-shrink-0 h-6 w-6 flex items-center justify-center rounded-full bg-purple-100 text-purple-600 mr-3">
