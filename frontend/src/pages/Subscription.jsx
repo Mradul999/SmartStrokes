@@ -82,7 +82,7 @@ const Subscription = ({ theme }) => {
         { amount },
         { withCredentials: true }
       );
-
+      console.log(import.meta.env.VITE_RAZORPAY_ID);
       const options = {
         key: import.meta.env.VITE_RAZORPAY_ID,
         amount: data.order.amount,

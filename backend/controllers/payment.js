@@ -5,15 +5,15 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const razorpayinstance = new razorpay({
-  key_id: process.env.RAZORPAY_ID,
-  key_secret: process.env.RAZORPAY_SECRET,
+  key_id: process.env.VITE_RAZORPAY_ID,
+  key_secret: process.env.VITE_RAZORPAY_SECRET,
 });
 
 //function to create the order
 export const createOrder = async (req, res) => {
   try {
     const { amount } = req.body;
-    console.log("amount from frontend", amount);
+    // console.log("amount from frontend", amount);
     const options = {
       amount: amount * 100,
 
@@ -35,7 +35,7 @@ export const verifyOrder = async (req, res) => {
     const { order_id, payment_id, razorpay_signature } = req.body;
     const body = order_id + "|" + payment_id;
     const signature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_SECRET)
+      .createHmac("sha256", process.env.VITE_RAZORPAY_SECRET)
       .update(body.toString())
       .digest("hex");
 
