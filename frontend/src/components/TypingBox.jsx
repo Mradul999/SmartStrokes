@@ -11,6 +11,8 @@ import TypingresultStore from "../store/TypingResultStore.js";
 import { ThemeContext } from "../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
 
+import { ToastContainer, toast } from "react-toastify";
+
 const TypingBox = () => {
   const [userInput, setUserInput] = useState("");
   const [startTime, setStartTime] = useState(null);
@@ -45,6 +47,7 @@ const TypingBox = () => {
   const currentUser = auhtStore((state) => state.currentUser);
   const setTypingresult = TypingresultStore((state) => state.setTypingresult);
   const { theme } = useContext(ThemeContext);
+  const isDark = theme === "dark";
 
   useEffect(() => {
     // Check if device is mobile
@@ -461,6 +464,13 @@ const TypingBox = () => {
         { withCredentials: true }
       );
 
+      if (response.status === 404) {
+        toast.error(
+          "No active subscription found. Please subscribe to a plan first"
+        );
+        return;
+      }
+
       if (response.status === 200) {
         SetLoading(false);
         setSampleText(response.data.message);
@@ -469,7 +479,23 @@ const TypingBox = () => {
       }
     } catch (error) {
       SetLoading(false);
-      alert("Failed to generate AI text");
+      if (error.response) {
+        // Server responded with error status
+        if (error.response.status === 404) {
+          toast.error(
+            "No active subscription found. Please subscribe to a plan first"
+          );
+        } else if (error.response.status === 403) {
+          toast.error("Your subscription has expired. Please renew.");
+        } else if (error.response.status === 429) {
+          toast.error("Daily usage limit reached. Try again tomorrow.");
+        } else {
+          toast.error(error.response.data.message || "Something went wrong!");
+        }
+      } else {
+        // Error setting up request
+        toast.error("Failed to generate AI text.");
+      }
     }
   };
 
@@ -1294,6 +1320,11 @@ const TypingBox = () => {
             : "0 2px 4px rgba(0, 0, 0, 0.2)"};
         }
       `}</style>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        theme={isDark ? "dark" : "light"}
+      />
     </div>
   );
 };

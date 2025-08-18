@@ -16,11 +16,12 @@ import Layout from "./components/Layout";
 import { ThemeProvider } from "./context/ThemeContext";
 import Test from "./pages/Test";
 import PrivateRoute from "./components/PrivateRoute";
+import Subscription from "./pages/Subscription";
 
 function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
+    <BrowserRouter>
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -45,12 +46,18 @@ function App() {
               }
             />
             <Route path="/otp-verification" element={<OTPVerification />} />
-            <Route path="/dashboard" element={<PrivateRoute >
-              <Dashboard/>
-            </PrivateRoute>} />
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/test" element={<Test />} />
+            <Route path="/subscription" element={<Subscription />}></Route>
           </Routes>
         </Layout>
       </BrowserRouter>

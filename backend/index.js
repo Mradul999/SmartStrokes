@@ -10,6 +10,10 @@ import authRoute from "./Routes/authRoute.js";
 import resultRoute from "./Routes/resultRoute.js";
 import contactRoute from "./Routes/contactRoute.js";
 
+import paymentRoute from "./Routes/paymentRoute.js";
+
+import subscriptionRoute from "./Routes/subscription.js";
+
 dotenv.config();
 dbconnect();
 
@@ -29,6 +33,9 @@ app.use("/api/text", textRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/result", resultRoute);
 app.use("/api/contact", contactRoute);
+app.use("/api/razorpay", paymentRoute);
+
+app.use("/api/subscription",subscriptionRoute);
 
 // Simple test route to verify server connectivity
 app.get("/api/test", (req, res) => {
