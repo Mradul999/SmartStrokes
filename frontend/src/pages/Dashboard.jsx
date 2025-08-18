@@ -15,6 +15,35 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
+  const [activePlanId, setActivePlanId] = useState(null);
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [checkingExpiration, setCheckingExpiration] = useState(false);
+  
+
+  const planMap = {
+  1: {
+    name: "Basic",
+    features: ["10 Tests per month", "Basic Analytics", "Community"],
+  },
+  2: {
+    name: "Pro",
+    features: [
+      "Unlimited Tests",
+      "Advanced Analytics",
+      "Priority Support",
+      "Download Reports",
+    ],
+  },
+  3: {
+    name: "Premium",
+    features: [
+      "All Pro Features",
+      "1-on-1 Mentorship",
+      "Early Access to Features",
+      "Custom Test Builder",
+    ],
+  },
+};
 
   const navigate = useNavigate();
 
@@ -25,6 +54,50 @@ const Dashboard = () => {
       fileInputRef.current.click();
     }
   };
+
+  // Function to check and update expired subscriptions
+  const checkExpiredSubscriptions = async () => {
+    try {
+      setCheckingExpiration(true);
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/subscription/check-expired`,
+        {},
+        { withCredentials: true }
+      );
+      
+      if (response.data.updatedCount > 0) {
+        console.log(`Updated ${response.data.updatedCount} expired subscriptions`);
+        // Refresh subscription data after updating expired subscriptions
+        await fetchSubscription();
+      }
+    } catch (error) {
+      console.error("Error checking expired subscriptions:", error);
+    } finally {
+      setCheckingExpiration(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      try {
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/subscription/mysubscription`,
+          { withCredentials: true }
+        );
+        setActivePlanId(data.planId);
+      } catch (error) {
+        console.log("No active subscription found.");
+      }
+    };
+
+    // First check for expired subscriptions, then fetch current subscription
+    const initializeSubscriptionData = async () => {
+      await checkExpiredSubscriptions();
+      await fetchSubscription();
+    };
+
+    initializeSubscriptionData();
+  }, []);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -257,19 +330,96 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="bg-[#2A2A3D]  rounded-xl text-white w-64 shadow-md">
-            <h3 className="text-lg font-semibold mb-2">Upgrade Plan</h3>
-            <p className="text-sm text-gray-400 mb-4">
-              Access more features with a premium subscription.
-            </p>
-            <button
-              onClick={() => (navigate("/subscription"))}
-              className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition"
-            >
-              View Plans
-            </button>
+          <div
+            className={`rounded-2xl w-72 p-5 shadow-md border transition-colors duration-300 ${
+              theme === "dark"
+                ? "bg-gray-900 border-gray-700 text-gray-100"
+                : "bg-white border-gray-200 text-gray-800"
+            }`}
+          >
+            <h3 className="text-xl font-semibold mb-2">Upgrade Plan</h3>
+            {activePlanId && planMap[activePlanId] ? (
+              <>
+                <div className="mb-2 text-sm font-medium text-green-600">
+                  {`You're on the ${planMap[activePlanId].name} plan`}
+                </div>
+                {checkingExpiration && (
+                  <div className="mb-2 text-xs text-gray-500">
+                    Checking subscription status...
+                  </div>
+                )}
+                <div className="flex flex-col gap-2 relative">
+                  <div
+                    className="inline-block relative"
+                    style={{ width: "fit-content" }}
+                  >
+                    <span
+                      className="text-green-700 dark:text-green-300 underline cursor-pointer text-sm font-medium"
+                      tabIndex={0}
+                      onClick={() => setShowPlanModal(true)}
+                    >
+                      View Plan Details
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => navigate("/subscription")}
+                    className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+                  >
+                    View More Plans
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="mb-2 text-sm font-medium text-green-600">
+                  Try our plans to get more features.
+                </div>
+                {checkingExpiration && (
+                  <div className="mb-2 text-xs text-gray-500">
+                    Checking subscription status...
+                  </div>
+                )}
+                <button
+                  onClick={() => navigate("/subscription")}
+                  className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+                >
+                  View Plans
+                </button>
+              </>
+            )}
           </div>
         </div>
+
+        {showPlanModal && activePlanId && planMap[activePlanId] && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+            onClick={() => setShowPlanModal(false)}
+          >
+            <div
+              className={`rounded-xl shadow-2xl border p-8 w-full max-w-md ${
+                theme === 'dark'
+                  ? 'bg-gray-900 border-gray-700'
+                  : 'bg-white border-gray-200'
+              }`}
+              onClick={e => e.stopPropagation()}
+            >
+              <h2 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-purple-300' : 'text-purple-700'}`}>
+                {planMap[activePlanId].name} Plan Details
+              </h2>
+              <ul className={`mb-6 list-disc list-inside ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
+                {planMap[activePlanId].features.map((feature, idx) => (
+                  <li key={idx}>{feature}</li>
+                ))}
+              </ul>
+              <button
+                onClick={() => setShowPlanModal(false)}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div

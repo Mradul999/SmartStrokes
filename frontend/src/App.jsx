@@ -21,7 +21,7 @@ import Subscription from "./pages/Subscription";
 function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
+    <BrowserRouter>
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />

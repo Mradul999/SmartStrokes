@@ -114,7 +114,7 @@ const Header = () => {
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-6 w-6 mr-1 sm:h-8 sm:w-8 sm:mr-2" // smaller on mobile
+                className="h-6 w-6 mr-1 sm:h-8 sm:w-8 sm:mr-2" 
               >
                 <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
               </svg>
