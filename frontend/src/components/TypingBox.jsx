@@ -11,7 +11,7 @@ import TypingresultStore from "../store/TypingResultStore.js";
 import { ThemeContext } from "../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
 
-import { ToastContainer, toast } from "react-toastify";
+import toast, { Toaster } from "react-hot-toast";
 
 const TypingBox = () => {
   const [userInput, setUserInput] = useState("");
@@ -631,7 +631,7 @@ const TypingBox = () => {
     >
       <div className="text-center mb-8">
         <h1
-          className={`text-3xl md:text-4xl text-center font-bold mb-2 ${
+          className={`text-3xl md:text-4xl text-center font-bold pb-2 mb-2 ${
             theme === "dark"
               ? "bg-gradient-to-r from-purple-400 to-indigo-300 bg-clip-text text-transparent"
               : "bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent"
@@ -1320,11 +1320,7 @@ const TypingBox = () => {
             : "0 2px 4px rgba(0, 0, 0, 0.2)"};
         }
       `}</style>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        theme={isDark ? "dark" : "light"}
-      />
+      <Toaster reverseOrder={false} />
     </div>
   );
 };

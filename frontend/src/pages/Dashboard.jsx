@@ -18,32 +18,33 @@ const Dashboard = () => {
   const [activePlanId, setActivePlanId] = useState(null);
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [checkingExpiration, setCheckingExpiration] = useState(false);
-  
+
+  const [remainingDailyLimit, setRemainingDailyLimit] = useState(0);
 
   const planMap = {
-  1: {
-    name: "Basic",
-    features: ["10 Tests per month", "Basic Analytics", "Community"],
-  },
-  2: {
-    name: "Pro",
-    features: [
-      "Unlimited Tests",
-      "Advanced Analytics",
-      "Priority Support",
-      "Download Reports",
-    ],
-  },
-  3: {
-    name: "Premium",
-    features: [
-      "All Pro Features",
-      "1-on-1 Mentorship",
-      "Early Access to Features",
-      "Custom Test Builder",
-    ],
-  },
-};
+    1: {
+      name: "Basic",
+      features: ["10 Tests per month", "Basic Analytics", "Community"],
+    },
+    2: {
+      name: "Pro",
+      features: [
+        "Unlimited Tests",
+        "Advanced Analytics",
+        "Priority Support",
+        "Download Reports",
+      ],
+    },
+    3: {
+      name: "Premium",
+      features: [
+        "All Pro Features",
+        "1-on-1 Mentorship",
+        "Early Access to Features",
+        "Custom Test Builder",
+      ],
+    },
+  };
 
   const navigate = useNavigate();
 
@@ -64,9 +65,11 @@ const Dashboard = () => {
         {},
         { withCredentials: true }
       );
-      
+
       if (response.data.updatedCount > 0) {
-        console.log(`Updated ${response.data.updatedCount} expired subscriptions`);
+        console.log(
+          `Updated ${response.data.updatedCount} expired subscriptions`
+        );
         // Refresh subscription data after updating expired subscriptions
         await fetchSubscription();
       }
@@ -84,6 +87,8 @@ const Dashboard = () => {
           `${import.meta.env.VITE_API_URL}/api/subscription/mysubscription`,
           { withCredentials: true }
         );
+        // console.log("data from subscription mine",data)
+        setRemainingDailyLimit(data.remainingDailyLimit);
         setActivePlanId(data.planId);
       } catch (error) {
         console.log("No active subscription found.");
@@ -230,7 +235,7 @@ const Dashboard = () => {
     >
       <div className="max-w-6xl mx-auto px-4">
         <div
-          className={`flex flex-row justify-between w-full ${
+          className={`flex sm:flex-row flex-col items-center gap-6  sm:justify-between w-full ${
             theme === "dark" ? "bg-gray-800 border border-gray-700" : "bg-white"
           } rounded-2xl shadow-xl p-8 mb-8 transform transition-all hover:shadow-2xl`}
         >
@@ -343,6 +348,7 @@ const Dashboard = () => {
                 <div className="mb-2 text-sm font-medium text-green-600">
                   {`You're on the ${planMap[activePlanId].name} plan`}
                 </div>
+                <span className="text-base  font-semibold text-green-500">Remaining daily limit: {remainingDailyLimit}</span>
                 {checkingExpiration && (
                   <div className="mb-2 text-xs text-gray-500">
                     Checking subscription status...
@@ -397,16 +403,24 @@ const Dashboard = () => {
           >
             <div
               className={`rounded-xl shadow-2xl border p-8 w-full max-w-md ${
-                theme === 'dark'
-                  ? 'bg-gray-900 border-gray-700'
-                  : 'bg-white border-gray-200'
+                theme === "dark"
+                  ? "bg-gray-900 border-gray-700"
+                  : "bg-white border-gray-200"
               }`}
-              onClick={e => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
             >
-              <h2 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-purple-300' : 'text-purple-700'}`}>
+              <h2
+                className={`text-2xl font-bold mb-4 ${
+                  theme === "dark" ? "text-purple-300" : "text-purple-700"
+                }`}
+              >
                 {planMap[activePlanId].name} Plan Details
               </h2>
-              <ul className={`mb-6 list-disc list-inside ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
+              <ul
+                className={`mb-6 list-disc list-inside ${
+                  theme === "dark" ? "text-gray-200" : "text-gray-700"
+                }`}
+              >
                 {planMap[activePlanId].features.map((feature, idx) => (
                   <li key={idx}>{feature}</li>
                 ))}
