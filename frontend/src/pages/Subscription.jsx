@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import toast, { Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 
 const plans = [
@@ -51,6 +51,8 @@ const Subscription = ({ theme }) => {
   const [activePlanId, setActivePlanId] = useState(null);
   const isDark = theme === "dark";
 
+  const [loading, setLoading] = useState(null);
+
   useEffect(() => {
     const fetchSubscription = async () => {
       try {
@@ -68,11 +70,13 @@ const Subscription = ({ theme }) => {
   }, []);
 
   const handleCheckout = async ({ amount, id }) => {
+    setLoading(id);
     try {
       const loaded = await loadScript(
         "https://checkout.razorpay.com/v1/checkout.js"
       );
       if (!loaded) {
+        setLoading(false);
         alert("Failed to load Razorpay");
         return;
       }
@@ -82,14 +86,15 @@ const Subscription = ({ theme }) => {
         { amount },
         { withCredentials: true }
       );
-      console.log(import.meta.env.VITE_RAZORPAY_ID);
+      setLoading(false);
+      // console.log(import.meta.env.VITE_RAZORPAY_ID);
       const options = {
         key: import.meta.env.VITE_RAZORPAY_ID,
         amount: data.order.amount,
         currency: "INR",
         name: "Mradul Verma",
         description: "Pro subscription",
-        image: "https://example.com/your_logo",
+        image: "",
         order_id: data.order.id,
         handler: async function (response) {
           const paymentResult = {
@@ -118,11 +123,11 @@ const Subscription = ({ theme }) => {
             );
 
             if (createSubscription.status === 200) {
-              alert("Subscription added");
+              toast.success("Subscribed successfully");
               setActivePlanId(id);
             }
           } else {
-            alert("Payment verification failed");
+            toast.error("Payment verification failed");
           }
         },
         prefill: {
@@ -134,7 +139,7 @@ const Subscription = ({ theme }) => {
           address: "Razorpay Corporate Office",
         },
         theme: {
-          color: "#3399cc",
+          color: "#FFFFFF",
         },
       };
 
@@ -194,10 +199,10 @@ const Subscription = ({ theme }) => {
                   ))}
                 </ul>
                 <button
-                  disabled={activePlanId === plan.id}
+                  disabled={activePlanId === plan.id || loading}
                   onClick={() => {
                     if (activePlanId !== null && activePlanId !== plan.id) {
-                      toast.info("You have already subscribed to one plan.");
+                      toast.error("You have already subscribed to one plan.");
 
                       return;
                     }
@@ -213,6 +218,8 @@ const Subscription = ({ theme }) => {
                 >
                   {activePlanId === plan.id
                     ? "Subscribed"
+                    : loading === plan.id
+                    ? "Loading.."
                     : `Choose ${plan.name}`}
                 </button>
               </div>
@@ -220,11 +227,7 @@ const Subscription = ({ theme }) => {
           })}
         </div>
       </div>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        theme={isDark ? "dark" : "light"}
-      />
+      <Toaster reverseOrder={false} />
     </div>
   );
 };

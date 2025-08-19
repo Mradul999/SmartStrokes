@@ -17,12 +17,16 @@ import { ThemeProvider } from "./context/ThemeContext";
 import Test from "./pages/Test";
 import PrivateRoute from "./components/PrivateRoute";
 import Subscription from "./pages/Subscription";
+import Footer from "./components/Footer";
+import Header from "./components/Header";
 
 function App() {
   return (
     <ThemeProvider>
-    <BrowserRouter>
-        <Layout>
+      <BrowserRouter>
+        {/* <Layout> */}
+        <Header />
+        <div className="mt-16">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
@@ -59,7 +63,10 @@ function App() {
             <Route path="/test" element={<Test />} />
             <Route path="/subscription" element={<Subscription />}></Route>
           </Routes>
-        </Layout>
+        </div>
+
+        {/* </Layout> */}
+        <Footer />
       </BrowserRouter>
     </ThemeProvider>
   );

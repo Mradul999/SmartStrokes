@@ -130,6 +130,7 @@ export const getMySubscription = async (req, res, next) => {
       planId: subscription.planId,
       startDate: subscription.startDate,
       endDate: subscription.endDate,
+      remainingDailyLimit: subscription.planLimit - subscription.dailyUsage,
       daysRemaining: Math.ceil(
         (subscription.endDate - now) / (1000 * 60 * 60 * 24)
       ),
