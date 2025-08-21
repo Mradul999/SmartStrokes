@@ -24,25 +24,15 @@ const Dashboard = () => {
   const planMap = {
     1: {
       name: "Basic",
-      features: ["10 Tests per month", "Basic Analytics", "Community"],
+      features: ["10 AI Tests per Day"],
     },
     2: {
       name: "Pro",
-      features: [
-        "Unlimited Tests",
-        "Advanced Analytics",
-        "Priority Support",
-        "Download Reports",
-      ],
+      features: ["20 AI Tests per Day"],
     },
     3: {
       name: "Premium",
-      features: [
-        "All Pro Features",
-        "1-on-1 Mentorship",
-        "Early Access to Features",
-        "Custom Test Builder",
-      ],
+      features: ["30 AI Tests per Day", ,],
     },
   };
 
@@ -348,7 +338,9 @@ const Dashboard = () => {
                 <div className="mb-2 text-sm font-medium text-green-600">
                   {`You're on the ${planMap[activePlanId].name} plan`}
                 </div>
-                <span className="text-base  font-semibold text-green-500">Remaining daily limit: {remainingDailyLimit}</span>
+                <span className="text-base  font-semibold text-green-500">
+                  Remaining daily limit: {remainingDailyLimit}
+                </span>
                 {checkingExpiration && (
                   <div className="mb-2 text-xs text-gray-500">
                     Checking subscription status...

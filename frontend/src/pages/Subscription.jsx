@@ -8,31 +8,21 @@ const plans = [
     id: 1,
     name: "Basic",
     price: 1,
-    features: ["10 Tests per month", "Basic Analytics", "Community"],
+    features: ["10 AI Tests per Day"],
     highlight: false,
   },
   {
     id: 2,
     name: "Pro",
     price: 2,
-    features: [
-      "Unlimited Tests",
-      "Advanced Analytics",
-      "Priority Support",
-      "Download Reports",
-    ],
+    features: ["20 AI Tests per Day"],
     highlight: true,
   },
   {
     id: 3,
     name: "Premium",
     price: 3,
-    features: [
-      "All Pro Features",
-      "1-on-1 Mentorship",
-      "Early Access to Features",
-      "Custom Test Builder",
-    ],
+    features: ["30 AI Tests per Day", ,],
     highlight: false,
   },
 ];
@@ -153,7 +143,7 @@ const Subscription = ({ theme }) => {
 
   return (
     <div
-      className={`py-12 px-4 transition-colors duration-300 ${
+      className={`py-32 px-4 transition-colors duration-300 ${
         isDark ? "bg-[#18191A]" : "bg-white"
       }`}
     >
@@ -169,7 +159,7 @@ const Subscription = ({ theme }) => {
           Upgrade to unlock advanced features and level up your performance.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2  lg:grid-cols-3 gap-8">
           {plans.map((plan) => {
             return (
               <div
@@ -182,9 +172,9 @@ const Subscription = ({ theme }) => {
                     : "bg-white text-gray-800 border-gray-200"
                 }`}
               >
-                <h3 className="text-xl font-semibold mb-3">{plan.name}</h3>
+                <h3 className="text-xl font-semibold  mb-3">{plan.name}</h3>
                 <div className="text-3xl font-bold mb-4">₹{plan.price}/mo</div>
-                <ul className="text-sm space-y-2 mb-6">
+                <ul className="text-xl font-semibold space-y-2 mb-6">
                   {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-center gap-2">
                       <span
